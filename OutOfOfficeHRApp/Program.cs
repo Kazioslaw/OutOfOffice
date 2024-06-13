@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using OutOfOfficeHRApp.Data;
+
 namespace OutOfOfficeHRApp
 {
     public class Program
@@ -8,6 +11,11 @@ namespace OutOfOfficeHRApp
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddDbContext<OutOfOfficeContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("OutOfOfficeContext")
+                    ?? throw new InvalidOperationException("Connection string 'OutOfOfficeContext' not found."));
+            });
 
             var app = builder.Build();
 
