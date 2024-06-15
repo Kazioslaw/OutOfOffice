@@ -74,24 +74,28 @@ namespace OutOfOfficeHRApp.Data.Migrations
                     SubdivisionID = table.Column<int>(type: "int", nullable: false),
                     PositionID = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    OutOfOfficeBalace = table.Column<int>(type: "int", nullable: false),
-                    Photo = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    PeoplePartnerID = table.Column<int>(type: "int", nullable: true),
+                    OutOfOfficeBalance = table.Column<int>(type: "int", nullable: false),
+                    PhotoPath = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Employee", x => x.ID);
                     table.ForeignKey(
+                        name: "FK_Employee_Employee_PeoplePartnerID",
+                        column: x => x.PeoplePartnerID,
+                        principalTable: "Employee",
+                        principalColumn: "ID");
+                    table.ForeignKey(
                         name: "FK_Employee_Position_PositionID",
                         column: x => x.PositionID,
                         principalTable: "Position",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ID");
                     table.ForeignKey(
                         name: "FK_Employee_Subdivision_SubdivisionID",
                         column: x => x.SubdivisionID,
                         principalTable: "Subdivision",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -101,11 +105,10 @@ namespace OutOfOfficeHRApp.Data.Migrations
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EmployeeID = table.Column<int>(type: "int", nullable: false),
-                    ReasonID = table.Column<int>(type: "int", nullable: false),
                     AbsenceReasonID = table.Column<int>(type: "int", nullable: false),
                     StartDate = table.Column<DateOnly>(type: "date", nullable: false),
                     EndDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -121,8 +124,7 @@ namespace OutOfOfficeHRApp.Data.Migrations
                         name: "FK_LeaveRequest_Employee_EmployeeID",
                         column: x => x.EmployeeID,
                         principalTable: "Employee",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -135,7 +137,7 @@ namespace OutOfOfficeHRApp.Data.Migrations
                     StartDate = table.Column<DateOnly>(type: "date", nullable: false),
                     EndDate = table.Column<DateOnly>(type: "date", nullable: false),
                     EmployeeID = table.Column<int>(type: "int", nullable: false),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -162,10 +164,9 @@ namespace OutOfOfficeHRApp.Data.Migrations
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EmployeeID = table.Column<int>(type: "int", nullable: false),
-                    RequestID = table.Column<int>(type: "int", nullable: false),
                     LeaveRequestID = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -174,14 +175,12 @@ namespace OutOfOfficeHRApp.Data.Migrations
                         name: "FK_ApprovalRequest_Employee_EmployeeID",
                         column: x => x.EmployeeID,
                         principalTable: "Employee",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        principalColumn: "ID");
                     table.ForeignKey(
                         name: "FK_ApprovalRequest_LeaveRequest_LeaveRequestID",
                         column: x => x.LeaveRequestID,
                         principalTable: "LeaveRequest",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        principalColumn: "ID");
                 });
 
             migrationBuilder.InsertData(
@@ -231,7 +230,8 @@ namespace OutOfOfficeHRApp.Data.Migrations
                     { 6, "Buissness Analysis" },
                     { 7, "Information Security" },
                     { 8, "IT Infractructure" },
-                    { 9, "Data Management" }
+                    { 9, "Data Management" },
+                    { 10, "HR" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -242,7 +242,13 @@ namespace OutOfOfficeHRApp.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ApprovalRequest_LeaveRequestID",
                 table: "ApprovalRequest",
-                column: "LeaveRequestID");
+                column: "LeaveRequestID",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employee_PeoplePartnerID",
+                table: "Employee",
+                column: "PeoplePartnerID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employee_PositionID",

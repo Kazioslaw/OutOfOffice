@@ -11,13 +11,12 @@ namespace OutOfOfficeHRApp.Models
         public int EmployeeID { get; set; }
         public Employee Employee { get; set; }
         [Required]
-        public int ReasonID { get; set; }
         public AbsenceReason AbsenceReason { get; set; }
         [Required]
         public DateOnly StartDate { get; set; }
         [Required]
         public DateOnly EndDate { get; set; }
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
         [Required]
         public Status Status { get; set; } = Status.New;
     }

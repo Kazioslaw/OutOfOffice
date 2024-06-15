@@ -1,0 +1,94 @@
+﻿@model IEnumerable<OutOfOfficeHRApp.Models.Employee>
+
+@{
+    ViewData["Title"] = "Employee List";
+}
+
+<div class="d-flex justify-content-between align-items-center">
+    <h1>Employee list</h1>
+    <a class="btn btn-primary" asp-controller="Employee" asp-action="Create"><i class=" bi bi-person-add"></i> Add</a>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="FullName_asc">▲</a>
+                <a asp-action="Index" asp-route-sortOrder="FullName_desc">▼</a>
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="Subdivision_asc">▲</a>
+                <a asp-action="Index" asp-route-sortOrder="Subdivision_desc">▼</a>
+                @Html.DisplayNameFor(model => model.Subdivision)
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="Position_asc">▲</a>
+                <a asp-action="Index" asp-route-sortOrder="Position_desc">▼</a>
+                @Html.DisplayNameFor(model => model.Position)
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="IsActive_asc">▲</a>
+                <a asp-action="Index" asp-route-sortOrder="IsActive_desc">▼</a>
+                @Html.DisplayNameFor(model => model.IsActive)
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="PeoplePartner_asc">▲</a>
+                <a asp-action="Index" asp-route-sortOrder="PeoplePartner_desc">▼</a>
+                @Html.DisplayNameFor(model => model.PeoplePartner)
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="OutOfOfficeBalance_asc">▲</a>
+                <a asp-action="Index" asp-route-sortOrder="OutOfOfficeBalance_desc">▼</a>
+                @Html.DisplayNameFor(model => model.OutOfOfficeBalance)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PhotoPath)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="align-middle">
+                <td>
+                    @Html.DisplayFor(modelName => item.ID).
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Subdivision.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Position.Name)
+                </td>
+                <td class="text-center">
+                    @if (item.IsActive)
+                    {
+                        <span>Active</span>
+                    }
+                    else
+                    {
+                        <span>Inactive</span>
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PeoplePartner.FullName)
+                </td>
+                <td class="text-center">
+                    @Html.DisplayFor(model => item.OutOfOfficeBalance) @(item.OutOfOfficeBalance == 1 ? "day" : "days")
+                </td>
+                <td>
+                    <img src="@(item.PhotoPath != null ? item.PhotoPath : "http://placehold.it/48x48/")" style="width: 48px; height: 48px" />
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-secondary"><i class="bi bi-pencil"></i></a>
+                    <a asp-action="Deactivate" asp-route-id="@item.ID" class="btn btn-danger"><i class="bi bi-person-slash"></i></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

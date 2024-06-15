@@ -12,7 +12,7 @@ using OutOfOfficeHRApp.Data;
 namespace OutOfOfficeHRApp.Data.Migrations
 {
     [DbContext(typeof(OutOfOfficeContext))]
-    [Migration("20240613222757_initialCreate")]
+    [Migration("20240614190346_initialCreate")]
     partial class initialCreate
     {
         /// <inheritdoc />
@@ -78,16 +78,12 @@ namespace OutOfOfficeHRApp.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<string>("Comment")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EmployeeID")
                         .HasColumnType("int");
 
                     b.Property<int>("LeaveRequestID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RequestID")
                         .HasColumnType("int");
 
                     b.Property<int>("Status")
@@ -97,7 +93,8 @@ namespace OutOfOfficeHRApp.Data.Migrations
 
                     b.HasIndex("EmployeeID");
 
-                    b.HasIndex("LeaveRequestID");
+                    b.HasIndex("LeaveRequestID")
+                        .IsUnique();
 
                     b.ToTable("ApprovalRequest");
                 });
@@ -117,11 +114,13 @@ namespace OutOfOfficeHRApp.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<int>("OutOfOfficeBalace")
+                    b.Property<int>("OutOfOfficeBalance")
                         .HasColumnType("int");
 
-                    b.Property<string>("Photo")
-                        .IsRequired()
+                    b.Property<int>("PeoplePartnerID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhotoPath")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PositionID")
@@ -131,6 +130,8 @@ namespace OutOfOfficeHRApp.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("PeoplePartnerID");
 
                     b.HasIndex("PositionID");
 
@@ -151,7 +152,6 @@ namespace OutOfOfficeHRApp.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Comment")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EmployeeID")
@@ -159,9 +159,6 @@ namespace OutOfOfficeHRApp.Data.Migrations
 
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date");
-
-                    b.Property<int>("ReasonID")
-                        .HasColumnType("int");
 
                     b.Property<DateOnly>("StartDate")
                         .HasColumnType("date");
@@ -226,7 +223,6 @@ namespace OutOfOfficeHRApp.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<string>("Comment")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EmployeeID")
@@ -353,6 +349,11 @@ namespace OutOfOfficeHRApp.Data.Migrations
                         {
                             ID = 9,
                             Name = "Data Management"
+                        },
+                        new
+                        {
+                            ID = 10,
+                            Name = "HR"
                         });
                 });
 
@@ -361,13 +362,13 @@ namespace OutOfOfficeHRApp.Data.Migrations
                     b.HasOne("OutOfOfficeHRApp.Models.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("OutOfOfficeHRApp.Models.LeaveRequest", "LeaveRequest")
-                        .WithMany()
-                        .HasForeignKey("LeaveRequestID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithOne()
+                        .HasForeignKey("OutOfOfficeHRApp.Models.ApprovalRequest", "LeaveRequestID")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Employee");
@@ -377,17 +378,25 @@ namespace OutOfOfficeHRApp.Data.Migrations
 
             modelBuilder.Entity("OutOfOfficeHRApp.Models.Employee", b =>
                 {
+                    b.HasOne("OutOfOfficeHRApp.Models.Employee", "PeoplePartner")
+                        .WithMany()
+                        .HasForeignKey("PeoplePartnerID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("OutOfOfficeHRApp.Models.Position", "Position")
                         .WithMany()
                         .HasForeignKey("PositionID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("OutOfOfficeHRApp.Models.Subdivision", "Subdivision")
                         .WithMany()
                         .HasForeignKey("SubdivisionID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("PeoplePartner");
 
                     b.Navigation("Position");
 
@@ -405,7 +414,7 @@ namespace OutOfOfficeHRApp.Data.Migrations
                     b.HasOne("OutOfOfficeHRApp.Models.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("AbsenceReason");

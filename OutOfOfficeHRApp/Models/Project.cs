@@ -15,7 +15,7 @@ namespace OutOfOfficeHRApp.Models
         [Required]
         public int EmployeeID { get; set; }
         public Employee ProjectManager { get; set; }
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
         [Required]
         [Display(Name = "Status")]
         [DisplayFormat(DataFormatString = "{0:Active/Inactive}")]

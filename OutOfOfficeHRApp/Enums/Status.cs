@@ -4,6 +4,8 @@
     {
         New,
         Approved,
-        Rejected
+        Rejected,
+        Submitted,
+        Cancelled
     }
 }

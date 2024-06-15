@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.EntityFrameworkCore;
 using OutOfOfficeHRApp.Data;
 
@@ -17,6 +18,13 @@ namespace OutOfOfficeHRApp
                     ?? throw new InvalidOperationException("Connection string 'OutOfOfficeContext' not found."));
             });
 
+            builder.Services.AddAntiforgery(options =>
+            {
+                options.HeaderName = "RequestToken";
+            });
+
+            builder.Services.AddSwaggerGen();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -25,6 +33,21 @@ namespace OutOfOfficeHRApp
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
+            }
+
+            app.Use(next => context =>
+            {
+                var tokens = app.Services.GetRequiredService<IAntiforgery>();
+                var tokenSet = tokens.GetAndStoreTokens(context);
+                context.Response.Cookies.Append("XSRF", tokenSet.RequestToken,
+                    new Microsoft.AspNetCore.Http.CookieOptions { HttpOnly = false });
+                return next(context);
+            });
+
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
 
             app.UseHttpsRedirection();
@@ -37,6 +60,8 @@ namespace OutOfOfficeHRApp
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.MapControllers();
 
             app.Run();
         }
