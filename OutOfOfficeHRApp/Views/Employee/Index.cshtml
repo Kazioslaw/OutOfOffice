@@ -8,11 +8,12 @@
     <h1>Employee list</h1>
     <a class="btn btn-primary" asp-controller="Employee" asp-action="Create"><i class=" bi bi-person-add"></i> Add</a>
 </div>
+<hr />
 
 <table class="table">
     <thead>
-        <tr>
-            <th></th>
+        <tr class="text-center">
+            <th class="col-sm-1 text-center"></th>
             <th>
                 <a asp-action="Index" asp-route-sortOrder="FullName_asc">▲</a>
                 <a asp-action="Index" asp-route-sortOrder="FullName_desc">▼</a>
@@ -43,7 +44,7 @@
                 <a asp-action="Index" asp-route-sortOrder="OutOfOfficeBalance_desc">▼</a>
                 @Html.DisplayNameFor(model => model.OutOfOfficeBalance)
             </th>
-            <th>
+            <th class="col-sm-1">
                 @Html.DisplayNameFor(model => model.PhotoPath)
             </th>
             <th></th>
@@ -53,8 +54,8 @@
         @foreach (var item in Model)
         {
             <tr class="align-middle">
-                <td>
-                    @Html.DisplayFor(modelName => item.ID).
+                <td class="text-center">
+                    @Html.DisplayFor(modelItem => item.ID).
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.FullName)
@@ -66,14 +67,7 @@
                     @Html.DisplayFor(modelItem => item.Position.Name)
                 </td>
                 <td class="text-center">
-                    @if (item.IsActive)
-                    {
-                        <span>Active</span>
-                    }
-                    else
-                    {
-                        <span>Inactive</span>
-                    }
+                    @(item.IsActive ? "Active" : "Inactive")
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.PeoplePartner.FullName)
@@ -84,7 +78,7 @@
                 <td>
                     <img src="@(item.PhotoPath != null ? item.PhotoPath : "http://placehold.it/48x48/")" style="width: 48px; height: 48px" />
                 </td>
-                <td>
+                <td class="col-sm-1">
                     <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-secondary"><i class="bi bi-pencil"></i></a>
                     <a asp-action="Deactivate" asp-route-id="@item.ID" class="btn btn-danger"><i class="bi bi-person-slash"></i></a>
                 </td>

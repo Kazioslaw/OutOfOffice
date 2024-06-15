@@ -6,6 +6,7 @@ using OutOfOfficeHRApp.Models;
 
 namespace OutOfOfficeHRApp.Controllers
 {
+    [Route("[controller]")]
     public class LeaveRequestController : Controller
     {
         private readonly OutOfOfficeContext _context;
@@ -18,7 +19,7 @@ namespace OutOfOfficeHRApp.Controllers
         public async Task<IActionResult> GetLeaveRequests()
         {
             var leaveRequests = await _context.LeaveRequest.ToListAsync();
-            return Ok(leaveRequests);
+            return View("Index", leaveRequests);
         }
 
         [HttpGet("{id}")]
@@ -33,13 +34,13 @@ namespace OutOfOfficeHRApp.Controllers
             return Ok(leaveRequest);
         }
 
-        [HttpGet]
+        [HttpGet("Create")]
         public IActionResult AddLeaveRequest()
         {
             return View("Create");
         }
 
-        [HttpPost]
+        [HttpPost("Create")]
         public async Task<IActionResult> AddLeaveRequest(LeaveRequestController leaveRequest)
         {
             _context.Add(leaveRequest);
@@ -47,6 +48,11 @@ namespace OutOfOfficeHRApp.Controllers
             return Ok();
         }
         [HttpGet("Submit/{id}")]
+        public IActionResult Submit(int id)
+        {
+            var leaveRequest = _context.LeaveRequest.Include(lr => lr.AbsenceReason).Include(lr => lr.Employee).Include(lr => lr.Status).FirstOrDefaultAsync(lr => lr.ID == id);
+            return View("Submit", leaveRequest);
+        }
 
         [HttpPost("Submit/{id}")]
         public async Task<IActionResult> SubmitRequest(int id)
@@ -70,6 +76,11 @@ namespace OutOfOfficeHRApp.Controllers
         }
 
         [HttpGet("Cancel/{id}")]
+        public IActionResult Cancel(int id)
+        {
+            var leaveRequest = _context.LeaveRequest.Include(lr => lr.AbsenceReason).Include(lr => lr.Employee).Include(lr => lr.Status).FirstOrDefaultAsync(lr => lr.ID == id);
+            return View("Cancel", leaveRequest);
+        }
 
         [HttpPost("Cancel/{id}")]
         public async Task<IActionResult> CancelRequest(int id)

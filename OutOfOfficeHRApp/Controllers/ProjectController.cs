@@ -48,8 +48,8 @@ namespace OutOfOfficeHRApp.Controllers
             return Ok();
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProject(int id, [FromBody] Project project)
+        [HttpPost("{id}")]
+        public async Task<IActionResult> UpdateProject(int id, Project project)
         {
             var existingProject = await _context.Project.FindAsync(id);
             if (existingProject == null)

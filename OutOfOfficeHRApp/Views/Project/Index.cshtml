@@ -8,3 +8,48 @@
     <h1>Project list</h1>
     <a class="btn btn-primary" asp-controller="Project" asp-action="Create"><i class="bi bi-clipboard-plus"></i></a>
 </div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProjectType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProjectManager)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsActive)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="align-middle">
+                <td>
+                    @Html.DisplayFor(modelItem => item.ID).
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProjectType.Name)
+                </td>
+                <td>@Html.DisplayFor(modelItem => item.StartDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.EndDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.ProjectManager.FullName)</td>
+                <td clss="text-center">@(item.IsActive ? "Active" : "Inactive")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-secondary"><i class="bi bi-pencil"></i></a>
+                    <a asp-action="Deactivate" asp-route-id="@item.ID" class="btn btn-danger"><i class="bi bi-person-slash"></i></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,37 @@
+﻿@model IEnumerable<OutOfOfficeHRApp.Models.ApprovalRequest>
+
+@{
+    ViewData["Title"] = "Approval Request List";
+}
+
+<div class="d-flex justify-content-between align-items-center">
+    <h1>Approval request list</h1>
+</div>
+<hr />
+
+<table class="table">
+    <thead>
+        <tr class="text-center">
+            <th class="col-sm-1 text-center"></th>
+            <th>@Html.DisplayNameFor(model => model.Employee)</th>
+            <th>@Html.DisplayNameFor(model => model.LeaveRequest)</th>
+            <th>@Html.DisplayNameFor(model => model.Status)</th>
+            <th class="col-sm-1 text-center"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.ID).</td>
+                <td>@Html.DisplayFor(modelItem => item.Employee.FullName)</td>
+                <td>@Html.DisplayFor(modelItem => item.LeaveRequestID)</td>
+                <td>@Html.DisplayFor(modelItem => item.Status)</td>
+                <td>
+                    <a class="btn btn-secondary"></a>
+                    <a class="btn btn-danger"></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
