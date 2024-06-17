@@ -69,6 +69,12 @@ namespace OutOfOfficeHRApp.Data
                         .HasForeignKey(lr => lr.EmployeeID)
                         .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<LeaveRequest>()
+                        .HasOne(lr => lr.AbsenceReason)
+                        .WithMany()
+                        .HasForeignKey(lr => lr.AbsenceReasonID)
+                        .OnDelete(DeleteBehavior.NoAction);
+
             modelBuilder.Entity<ApprovalRequest>()
                         .HasOne(ar => ar.Employee)
                         .WithMany()

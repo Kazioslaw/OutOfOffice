@@ -22,12 +22,12 @@
             </div>
             <div class="form-group d-flex align-items-center my-3 text-right">
                 <label asp-for="SubdivisionID" class="control-label col-sm-2"></label>
-                <select asp-for="SubdivisionID" class="form-control" asp-items="ViewBag.SubdivisionID"></select>
+                <select asp-for="SubdivisionID" class="form-control" asp-items="ViewBag.Subdivision"></select>
                 <span asp-validation-for="SubdivisionID" class="text-danger"></span>
             </div>
             <div class="form-group d-flex align-items-center my-3 text-right">
                 <label asp-for="PositionID" class="control-label col-sm-2"></label>
-                <select asp-for="PositionID" class="form-control" asp-items="ViewBag.PositionID"></select>
+                <select asp-for="PositionID" class="form-control" asp-items="ViewBag.Position"></select>
                 <span asp-validation-for="PositionID" class="text-danger"></span>
             </div>
             <div class="form-group d-flex align-items-center my-3 text-right">
@@ -36,7 +36,7 @@
             </div>
             <div class="form-group d-flex align-items-center my-3 text-right">
                 <label asp-for="PeoplePartnerID" class="control-label col-sm-2"></label>
-                <select asp-for="PeoplePartnerID" class="form-control" asp-items="ViewBag.PeoplePartnerID"></select>
+                <select asp-for="PeoplePartnerID" class="form-control" asp-items="ViewBag.PeoplePartner"></select>
                 <span asp-validation-for="PeoplePartnerID" class="text-danger"></span>
             </div>
             <div class="form-group d-flex align-items-center my-3 text-right">
@@ -58,7 +58,7 @@
                         <div>
                             <img src="@Model.PhotoPath" alt="Employee photo" class="img-thumbnail" style="max-width: 256px; max-height: 256px" />
                             <button type="button" class="btn btn-danger ms-3 remove-photo-btn"
-                                    onclick="RemovePhoto(@Model.ID)">
+                                    onclick="removePhoto(@Model.ID)">
                                 <i class="bi bi-trash"></i> Usuń zdjęcie
                             </button>
                         </div>
@@ -74,38 +74,6 @@
         </form>
     </div>
 </div>
-
-<script>
-    function RemovePhoto(id) {
-        const token = getCsrfToken();
-
-        $.ajax({
-            url: `${id}/RemovePhoto`,
-            type: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestToken': token
-            },
-            success: function (data) {
-                alert(data);
-                window.location.reload();
-            },
-            error: function (xhr, status, error) {
-                console.error('Error: ', error)
-                alert('Token znów nie działa');
-            }
-        })
-    }
-    function Remove(Data) {
-        alert(Data);
-        window.location.reload()
-    }
-    function getCsrfToken() {
-        const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('XSRF='));
-        return tokenCookie ? tokenCookie.split('=')[1] : '';
-    }
-
-</script>
 
 
 @section Scripts {

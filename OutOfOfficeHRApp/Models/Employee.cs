@@ -11,18 +11,19 @@ namespace OutOfOfficeHRApp.Models
         [Display(Name = "Full Name")]
         public string FullName { get; set; }
         [Required]
+        [Display(Name = "Subdivision")]
         public int SubdivisionID { get; set; }
         public Subdivision Subdivision { get; set; }
         [Required]
+        [Display(Name = "Position")]
         public int PositionID { get; set; }
         public Position Position { get; set; }
         [Required]
         [Display(Name = "Status")]
-        [DisplayFormat(DataFormatString = "{0:Active/Inactive}")]
         public bool IsActive { get; set; }
         [Required]
-        public int? PeoplePartnerID { get; set; }
         [Display(Name = "HR Manager")]
+        public int? PeoplePartnerID { get; set; }
         public Employee? PeoplePartner { get; set; }
         [Required]
         [Display(Name = "Days off")]

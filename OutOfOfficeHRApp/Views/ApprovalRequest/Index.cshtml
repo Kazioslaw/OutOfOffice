@@ -7,25 +7,27 @@
 <div class="d-flex justify-content-between align-items-center">
     <h1>Approval request list</h1>
 </div>
-<hr />
 
 <table class="table">
     <thead>
         <tr class="text-center">
-            <th class="col-sm-1 text-center"></th>
-            <th>@Html.DisplayNameFor(model => model.Employee)</th>
-            <th>@Html.DisplayNameFor(model => model.LeaveRequest)</th>
+            <th class="col-sm-1">#</th>
+            <th>@Html.DisplayNameFor(model => model.EmployeeID)</th>
+            <th>@Html.DisplayNameFor(model => model.LeaveRequestID)</th>
             <th>@Html.DisplayNameFor(model => model.Status)</th>
-            <th class="col-sm-1 text-center"></th>
+            <th class="col-sm-1"></th>
         </tr>
     </thead>
     <tbody>
+        @{
+            int index = 1;
+        }
         @foreach (var item in Model)
         {
             <tr>
-                <td>@Html.DisplayFor(modelItem => item.ID).</td>
+                <td>@index++.</td>
                 <td>@Html.DisplayFor(modelItem => item.Employee.FullName)</td>
-                <td>@Html.DisplayFor(modelItem => item.LeaveRequestID)</td>
+                <td>@Html.DisplayFor(modelItem => item.LeaveRequest.Employee)</td>
                 <td>@Html.DisplayFor(modelItem => item.Status)</td>
                 <td>
                     <a class="btn btn-secondary"></a>
@@ -35,3 +37,48 @@
         }
     </tbody>
 </table>
+
+<nav aria-label="Page navigation">
+    @if (ViewBag.TotalPages > 1)
+    {
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link" aria-label="Previous" href="@Url.Action("GetEmployee", new{page = ViewBag.CurrentPage - 1})">&laquo;</a>
+            </li>
+            <li class="page-item @(1 == ViewBag.CurrentPage ? "active":"")">
+                <a class="page-link" href=@Url.Action("GetEmployee", new {page = 1})>1</a>
+            </li>
+            @if (ViewBag.CurrentPage > 3)
+            {
+                <li class="page-item disabled">
+                    <a class="page-link">...</a>
+                </li>
+            }
+            @for (int i = Math.Max(2, ViewBag.CurrentPage - 1); i < Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("GetEmployee", new { page = i })">@i</a>
+                </li>
+            }
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages - 2)
+            {
+                <li class="page-item disabled">
+                    <a class="page-link">...</a>
+                </li>
+            }
+
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "active":"")">
+                <a class="page-link" href=@Url.Action("GetEmployee", new {page = ViewBag.TotalPages})>@(ViewBag.TotalPages)</a>
+            </li>
+
+
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("GetEmployee", new { page = ViewBag.CurrentPage + 1 })" aria-label="Next">
+                    &raquo;
+                </a>
+            </li>
+
+        </ul>
+    }
+</nav>

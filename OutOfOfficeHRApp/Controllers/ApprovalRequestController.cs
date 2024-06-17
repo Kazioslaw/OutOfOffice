@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OutOfOfficeHRApp.Data;
-using OutOfOfficeHRApp.Enums;
 
 namespace OutOfOfficeHRApp.Controllers
 {
@@ -17,9 +16,16 @@ namespace OutOfOfficeHRApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetApprovalRequests()
+        public async Task<IActionResult> GetApprovalRequests(int page = 1)
         {
-            var approvals = await _context.ApprovalRequest.ToListAsync();
+            int pageSize = 25;
+            int totalItems = await _context.ApprovalRequest.CountAsync();
+
+            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
+
+            var approvals = await _context.ApprovalRequest.Skip((page - 1) * pageSize).Include(e => e.Employee).ToListAsync();
             return View("Index", approvals);
         }
 

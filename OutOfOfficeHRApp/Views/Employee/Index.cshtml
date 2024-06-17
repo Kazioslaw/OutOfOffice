@@ -8,40 +8,29 @@
     <h1>Employee list</h1>
     <a class="btn btn-primary" asp-controller="Employee" asp-action="Create"><i class=" bi bi-person-add"></i> Add</a>
 </div>
-<hr />
 
-<table class="table">
+<table class="table table-striped table-hover table-group-divider">
     <thead>
         <tr class="text-center">
-            <th class="col-sm-1 text-center"></th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="FullName_asc">▲</a>
-                <a asp-action="Index" asp-route-sortOrder="FullName_desc">▼</a>
+            <th class="col-sm-1 text-center">
+                #
+            </th>
+            <th data-column="FullName" data-order="">
                 @Html.DisplayNameFor(model => model.FullName)
             </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="Subdivision_asc">▲</a>
-                <a asp-action="Index" asp-route-sortOrder="Subdivision_desc">▼</a>
-                @Html.DisplayNameFor(model => model.Subdivision)
+            <th data-column="Subdivision" data-order="">
+                @Html.DisplayNameFor(model => model.SubdivisionID)
             </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="Position_asc">▲</a>
-                <a asp-action="Index" asp-route-sortOrder="Position_desc">▼</a>
-                @Html.DisplayNameFor(model => model.Position)
+            <th data-column="Position" data-order="">
+                @Html.DisplayNameFor(model => model.PositionID)
             </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="IsActive_asc">▲</a>
-                <a asp-action="Index" asp-route-sortOrder="IsActive_desc">▼</a>
+            <th data-column="IsActive" data-order="">
                 @Html.DisplayNameFor(model => model.IsActive)
             </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="PeoplePartner_asc">▲</a>
-                <a asp-action="Index" asp-route-sortOrder="PeoplePartner_desc">▼</a>
-                @Html.DisplayNameFor(model => model.PeoplePartner)
+            <th data-column="PeoplePartner" data-order="">
+                @Html.DisplayNameFor(model => model.PeoplePartnerID)
             </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="OutOfOfficeBalance_asc">▲</a>
-                <a asp-action="Index" asp-route-sortOrder="OutOfOfficeBalance_desc">▼</a>
+            <th data-column="OutOfOfficeBalance" data-order="">
                 @Html.DisplayNameFor(model => model.OutOfOfficeBalance)
             </th>
             <th class="col-sm-1">
@@ -51,11 +40,14 @@
         </tr>
     </thead>
     <tbody>
+        @{
+            int index = ((ViewBag.CurrentPage - 1) * ViewBag.PageSize + 1);
+        }
         @foreach (var item in Model)
         {
             <tr class="align-middle">
                 <td class="text-center">
-                    @Html.DisplayFor(modelItem => item.ID).
+                    @(index++).
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.FullName)
@@ -75,7 +67,7 @@
                 <td class="text-center">
                     @Html.DisplayFor(model => item.OutOfOfficeBalance) @(item.OutOfOfficeBalance == 1 ? "day" : "days")
                 </td>
-                <td>
+                <td class="text-center">
                     <img src="@(item.PhotoPath != null ? item.PhotoPath : "http://placehold.it/48x48/")" style="width: 48px; height: 48px" />
                 </td>
                 <td class="col-sm-1">
@@ -86,3 +78,49 @@
         }
     </tbody>
 </table>
+
+
+<nav aria-label="Page navigation">
+    @if (ViewBag.TotalPages > 1)
+    {
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link" aria-label="Previous" href="@Url.Action("GetEmployee", new{page = ViewBag.CurrentPage - 1})">&laquo;</a>
+            </li>
+            <li class="page-item @(1 == ViewBag.CurrentPage ? "active":"")">
+                <a class="page-link" href=@Url.Action("GetEmployee", new {page = 1})>1</a>
+            </li>
+            @if (ViewBag.CurrentPage > 3)
+            {
+                <li class="page-item disabled">
+                    <a class="page-link">...</a>
+                </li>
+            }
+            @for (int i = Math.Max(2, ViewBag.CurrentPage - 1); i < Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("GetEmployee", new { page = i })">@i</a>
+                </li>
+            }
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages - 2)
+            {
+                <li class="page-item disabled">
+                    <a class="page-link">...</a>
+                </li>
+            }
+
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "active":"")">
+                <a class="page-link" href=@Url.Action("GetEmployee", new {page = ViewBag.TotalPages})>@(ViewBag.TotalPages)</a>
+            </li>
+
+
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("GetEmployee", new { page = ViewBag.CurrentPage + 1 })" aria-label="Next">
+                    &raquo;
+                </a>
+            </li>
+
+        </ul>
+    }
+</nav>

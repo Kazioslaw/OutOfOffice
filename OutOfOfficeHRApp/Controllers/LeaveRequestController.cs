@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OutOfOfficeHRApp.Data;
-using OutOfOfficeHRApp.Enums;
 using OutOfOfficeHRApp.Models;
+using static OutOfOfficeHRApp.Utilities;
 
 namespace OutOfOfficeHRApp.Controllers
 {
@@ -16,9 +16,16 @@ namespace OutOfOfficeHRApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetLeaveRequests()
+        public async Task<IActionResult> GetLeaveRequests(int page = 1)
         {
-            var leaveRequests = await _context.LeaveRequest.ToListAsync();
+            int pageSize = 25;
+            int totalItems = await _context.LeaveRequest.CountAsync();
+
+            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
+
+            var leaveRequests = await _context.LeaveRequest.Include(e => e.Employee).Include(e => e.AbsenceReason).ToListAsync();
             return View("Index", leaveRequests);
         }
 
@@ -37,15 +44,19 @@ namespace OutOfOfficeHRApp.Controllers
         [HttpGet("Create")]
         public IActionResult AddLeaveRequest()
         {
+            ViewBag.Employee = CreateSelectList(_context.Employee, "ID", "FullName");
+            ViewBag.AbsenceReason = CreateSelectList(_context.AbsenceReason, "ID", "Name");
+
             return View("Create");
         }
 
         [HttpPost("Create")]
-        public async Task<IActionResult> AddLeaveRequest(LeaveRequestController leaveRequest)
+        public async Task<IActionResult> AddLeaveRequest(LeaveRequest leaveRequest)
         {
+            leaveRequest.Status = Status.New;
             _context.Add(leaveRequest);
             await _context.SaveChangesAsync();
-            return Ok();
+            return RedirectToAction("Index");
         }
         [HttpGet("Submit/{id}")]
         public IActionResult Submit(int id)

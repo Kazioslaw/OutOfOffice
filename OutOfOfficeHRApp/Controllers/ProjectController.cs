@@ -16,8 +16,14 @@ namespace OutOfOfficeHRApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetProjects()
+        public async Task<IActionResult> GetProjects(int page = 1)
         {
+            int pageSize = 25;
+            int totalItems = await _context.Project.CountAsync();
+
+            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
             var projects = await _context.Project.ToListAsync();
             return View("Index", projects);
         }

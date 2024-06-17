@@ -1,5 +1,4 @@
-﻿using OutOfOfficeHRApp.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace OutOfOfficeHRApp.Models
 {
@@ -12,6 +11,7 @@ namespace OutOfOfficeHRApp.Models
         public int EmployeeID { get; set; }
         public Employee Employee { get; set; }
         [Required]
+        [Display(Name = "Leave Request")]
         public int LeaveRequestID { get; set; }
         public LeaveRequest LeaveRequest { get; set; }
         [Required]
