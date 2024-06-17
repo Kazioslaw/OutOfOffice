@@ -16,6 +16,7 @@ namespace OutOfOfficeHRApp.Models
         public LeaveRequest LeaveRequest { get; set; }
         [Required]
         public Status Status { get; set; } = Status.New;
+        [Display(Name = "Approver comment")]
         public string? Comment { get; set; }
     }
 }

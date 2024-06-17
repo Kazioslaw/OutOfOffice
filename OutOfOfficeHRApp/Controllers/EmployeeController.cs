@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿global using static OutOfOfficeHRApp.Utilities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OutOfOfficeHRApp.Data;
 using OutOfOfficeHRApp.Models;
-using static OutOfOfficeHRApp.Utilities;
 
 namespace OutOfOfficeHRApp.Controllers
 {

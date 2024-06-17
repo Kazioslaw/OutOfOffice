@@ -8,12 +8,14 @@
     <h1>Approval request list</h1>
 </div>
 
-<table class="table">
-    <thead>
+
+<table class="table table-striped table-hover table-group-divider align-middle">
+    <thead class="col-sm-8">
         <tr class="text-center">
             <th class="col-sm-1">#</th>
             <th>@Html.DisplayNameFor(model => model.EmployeeID)</th>
-            <th>@Html.DisplayNameFor(model => model.LeaveRequestID)</th>
+            <th class="col-sm-4">@Html.DisplayNameFor(model => model.LeaveRequestID)</th>
+            <th>@Html.DisplayNameFor(model => model.Comment)</th>
             <th>@Html.DisplayNameFor(model => model.Status)</th>
             <th class="col-sm-1"></th>
         </tr>
@@ -24,14 +26,35 @@
         }
         @foreach (var item in Model)
         {
-            <tr>
-                <td>@index++.</td>
+            <tr class="align-center">
+
+                @{
+                    var comment = item.Comment;
+
+                    const int maxLength = 150;
+
+                    if (comment?.Length > maxLength)
+                    {
+                        int lastSpace = comment.LastIndexOf(' ', maxLength);
+                        if (lastSpace != -1)
+                        {
+                            comment = comment.Substring(0, lastSpace) + " ...";
+                        }
+                        else
+                        {
+                            comment = comment.Substring(0, maxLength) + " ...";
+                        }
+                    }
+                }
+
+                <td class="text-center">@(index++).</td>
                 <td>@Html.DisplayFor(modelItem => item.Employee.FullName)</td>
-                <td>@Html.DisplayFor(modelItem => item.LeaveRequest.Employee)</td>
-                <td>@Html.DisplayFor(modelItem => item.Status)</td>
+                <td>Employee: @Html.DisplayFor(modelItem => item.LeaveRequest.Employee.FullName). Start Date: @Html.DisplayFor(modelItem => item.LeaveRequest.StartDate) </td>
+                <td>@comment</td>
+                <td class="text-center">@Html.DisplayFor(modelItem => item.Status)</td>
                 <td>
-                    <a class="btn btn-secondary"></a>
-                    <a class="btn btn-danger"></a>
+                    <a asp-action="Approve" class="btn btn-secondary"><i class="bi bi-file-earmark-check"></i></a>
+                    <a asp-action="Reject" class="btn btn-danger"><i class="bi bi-file-earmark-excel"></i></a>
                 </td>
             </tr>
         }

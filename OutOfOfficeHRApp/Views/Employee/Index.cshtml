@@ -9,7 +9,7 @@
     <a class="btn btn-primary" asp-controller="Employee" asp-action="Create"><i class=" bi bi-person-add"></i> Add</a>
 </div>
 
-<table class="table table-striped table-hover table-group-divider">
+<table class="table table-striped table-hover table-group-divider align-middle">
     <thead>
         <tr class="text-center">
             <th class="col-sm-1 text-center">
@@ -46,6 +46,7 @@
         @foreach (var item in Model)
         {
             <tr class="align-middle">
+
                 <td class="text-center">
                     @(index++).
                 </td>

@@ -25,7 +25,7 @@ namespace OutOfOfficeHRApp.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
 
-            var leaveRequests = await _context.LeaveRequest.Include(e => e.Employee).Include(e => e.AbsenceReason).ToListAsync();
+            var leaveRequests = await _context.LeaveRequest.Include(lr => lr.Employee).Include(lr => lr.AbsenceReason).ToListAsync();
             return View("Index", leaveRequests);
         }
 
@@ -33,7 +33,7 @@ namespace OutOfOfficeHRApp.Controllers
 
         public async Task<IActionResult> GetLeaveRequest(int id)
         {
-            var leaveRequest = await _context.LeaveRequest.FindAsync(id);
+            var leaveRequest = await _context.LeaveRequest.Include(lr => lr.Employee).Include(lr => lr.AbsenceReason).FirstOrDefaultAsync(lr => lr.ID == id);
             if (leaveRequest == null)
             {
                 return NotFound();
@@ -59,9 +59,9 @@ namespace OutOfOfficeHRApp.Controllers
             return RedirectToAction("Index");
         }
         [HttpGet("Submit/{id}")]
-        public IActionResult Submit(int id)
+        public async Task<IActionResult> Submit(int id)
         {
-            var leaveRequest = _context.LeaveRequest.Include(lr => lr.AbsenceReason).Include(lr => lr.Employee).Include(lr => lr.Status).FirstOrDefaultAsync(lr => lr.ID == id);
+            var leaveRequest = await _context.LeaveRequest.Include(lr => lr.AbsenceReason).Include(lr => lr.Employee).FirstOrDefaultAsync(lr => lr.ID == id);
             return View("Submit", leaveRequest);
         }
 
@@ -77,19 +77,19 @@ namespace OutOfOfficeHRApp.Controllers
             var approvalRequest = new ApprovalRequest
             {
                 LeaveRequest = leaveRequest,
-                EmployeeID = await _context.Employee.Where(e => e.Position.Name == "HR Manager").Select(e => e.ID).FirstOrDefaultAsync(),
+                EmployeeID = await _context.Employee.Where(lr => lr.Position.Name == "HR Manager").Select(lr => lr.ID).FirstOrDefaultAsync(),
             };
             _context.Update(leaveRequest);
             _context.Add(approvalRequest);
             await _context.SaveChangesAsync();
-            return Ok();
+            return RedirectToAction("Index");
 
         }
 
         [HttpGet("Cancel/{id}")]
-        public IActionResult Cancel(int id)
+        public async Task<IActionResult> Cancel(int id)
         {
-            var leaveRequest = _context.LeaveRequest.Include(lr => lr.AbsenceReason).Include(lr => lr.Employee).Include(lr => lr.Status).FirstOrDefaultAsync(lr => lr.ID == id);
+            var leaveRequest = await _context.LeaveRequest.Include(lr => lr.AbsenceReason).Include(lr => lr.Employee).FirstOrDefaultAsync(lr => lr.ID == id);
             return View("Cancel", leaveRequest);
         }
 
@@ -104,7 +104,7 @@ namespace OutOfOfficeHRApp.Controllers
             leaveRequest.Status = Status.Cancelled;
             _context.Update(leaveRequest);
             await _context.SaveChangesAsync();
-            return Ok();
+            return RedirectToAction("Index");
         }
     }
 }

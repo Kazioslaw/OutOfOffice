@@ -24,7 +24,7 @@ namespace OutOfOfficeHRApp.Controllers
             ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
-            var projects = await _context.Project.ToListAsync();
+            var projects = await _context.Project.Include(p => p.ProjectManager).Include(p => p.ProjectType).ToListAsync();
             return View("Index", projects);
         }
 
@@ -43,15 +43,18 @@ namespace OutOfOfficeHRApp.Controllers
 
         public async Task<IActionResult> AddProject()
         {
+            ViewBag.ProjectType = CreateSelectList(_context.ProjectType, "ID", "Name");
+            ViewBag.ProjectManager = CreateSelectList(_context.Employee.Where(e => e.Position.Name == "Project Manager"), "ID", "FullName");
             return View("Create");
         }
 
-        [HttpPost]
+        [HttpPost("Create")]
         public async Task<IActionResult> AddProject(Project project)
         {
+            project.IsActive = true;
             _context.Project.Add(project);
             await _context.SaveChangesAsync();
-            return Ok();
+            return RedirectToAction("Index");
         }
 
         [HttpPost("{id}")]
@@ -67,7 +70,6 @@ namespace OutOfOfficeHRApp.Controllers
             existingProject.EndDate = project.EndDate;
             existingProject.EmployeeID = project.EmployeeID;
             existingProject.Comment = project.Comment;
-            existingProject.IsActive = project.IsActive;
             _context.Update(existingProject);
             return Ok();
         }

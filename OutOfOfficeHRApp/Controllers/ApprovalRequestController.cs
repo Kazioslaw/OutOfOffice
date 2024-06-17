@@ -25,7 +25,7 @@ namespace OutOfOfficeHRApp.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
 
-            var approvals = await _context.ApprovalRequest.Skip((page - 1) * pageSize).Include(e => e.Employee).ToListAsync();
+            var approvals = await _context.ApprovalRequest.Skip((page - 1) * pageSize).Include(ar => ar.Employee).Include(ar => ar.LeaveRequest).ThenInclude(ar => ar.Employee).ToListAsync();
             return View("Index", approvals);
         }
 
