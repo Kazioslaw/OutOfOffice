@@ -1,0 +1,145 @@
+﻿@model IEnumerable<OutOfOfficeHRApp.Models.Employee>
+
+@{
+    ViewData["Title"] = "Employee List";
+}
+
+<div class="d-flex justify-content-between align-items-center">
+    <h1>Employee list</h1>
+    <a class="btn btn-primary" asp-controller="Employee" asp-action="Create"><i class=" bi bi-person-add"></i> Add</a>
+</div>
+
+<table class="table table-striped table-hover table-group-divider align-middle">
+    <thead>
+        <tr class="text-center">
+            <th class="col-sm-1 text-center">
+                #
+            </th>
+            <th data-column="FullName" data-order="">
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            <th data-column="Subdivision" data-order="">
+                @Html.DisplayNameFor(model => model.SubdivisionID)
+            </th>
+            <th data-column="Position" data-order="">
+                @Html.DisplayNameFor(model => model.PositionID)
+            </th>
+            <th data-column="IsActive" data-order="">
+                @Html.DisplayNameFor(model => model.IsActive)
+            </th>
+            <th data-column="PeoplePartner" data-order="">
+                @Html.DisplayNameFor(model => model.PeoplePartnerID)
+            </th>
+            <th data-column="OutOfOfficeBalance" data-order="">
+                @Html.DisplayNameFor(model => model.OutOfOfficeBalance)
+            </th>
+            <th class="col-sm-1">
+                @Html.DisplayNameFor(model => model.PhotoPath)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int index = ((ViewBag.CurrentPage - 1) * ViewBag.PageSize + 1);
+        }
+        @foreach (var item in Model)
+        {
+            <tr class="align-middle">
+
+                <td class="text-center">
+                    @(index++).
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Subdivision.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Position.Name)
+                </td>
+                <td class="text-center">
+                    @(item.IsActive ? "Active" : "Inactive")
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PeoplePartner.FullName)
+                </td>
+                <td class="text-center">
+                    @Html.DisplayFor(model => item.OutOfOfficeBalance) @(item.OutOfOfficeBalance == 1 ? "day" : "days")
+                </td>
+                <td class="text-center">
+                    <img src="@(item.PhotoPath != null ? item.PhotoPath : "http://placehold.it/48x48/")" style="width: 48px; height: 48px" />
+                </td>
+                <td style="white-space: nowrap;">
+                    <div class="d-flex align-items-center">
+                        <a asp-action="." asp-route-id="@item.ID" class="btn btn-secondary me-1"><i class="bi bi-file-text"> </i></a>
+                        <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-outline-primary me-1"><i class="bi bi-pencil"></i></a>
+                        @if (item.IsActive)
+                        {
+                            <form asp-action="Deactivate" asp-route-id="@item.ID" method="post">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-person-slash"></i>
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="Activate" asp-route-id="@item.ID" method="post">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-person-check"></i>
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<nav aria-label="Page navigation">
+    @if (ViewBag.TotalPages > 1)
+    {
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link" aria-label="Previous" href="@Url.Action("GetEmployee", new{page = ViewBag.CurrentPage - 1})">&laquo;</a>
+            </li>
+            <li class="page-item @(1 == ViewBag.CurrentPage ? "active":"")">
+                <a class="page-link" href=@Url.Action("GetEmployee", new {page = 1})>1</a>
+            </li>
+            @if (ViewBag.CurrentPage > 3)
+            {
+                <li class="page-item disabled">
+                    <a class="page-link">...</a>
+                </li>
+            }
+            @for (int i = Math.Max(2, ViewBag.CurrentPage - 1); i < Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("GetEmployee", new { page = i })">@i</a>
+                </li>
+            }
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages - 2)
+            {
+                <li class="page-item disabled">
+                    <a class="page-link">...</a>
+                </li>
+            }
+
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "active":"")">
+                <a class="page-link" href=@Url.Action("GetEmployee", new {page = ViewBag.TotalPages})>@(ViewBag.TotalPages)</a>
+            </li>
+
+
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("GetEmployee", new { page = ViewBag.CurrentPage + 1 })" aria-label="Next">
+                    &raquo;
+                </a>
+            </li>
+
+        </ul>
+    }
+</nav>

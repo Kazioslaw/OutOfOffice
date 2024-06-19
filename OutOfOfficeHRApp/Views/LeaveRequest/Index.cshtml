@@ -1,0 +1,122 @@
+﻿@model IEnumerable<OutOfOfficeHRApp.Models.LeaveRequest>
+
+@{
+    ViewData["Title"] = "Leave Request List";
+}
+
+<div class="d-flex justify-content-between align-items-center">
+    <h1>Leave request list</h1>
+    <a class="btn btn-primary" asp-controller="LeaveRequest" asp-action="Create"><i class="bi bi-clipboard-plus"></i></a>
+</div>
+
+<table class="table table-striped table-hover table-group-divider align-middle">
+    <thead>
+        <tr class="text-center">
+            <th class="col-sm-1">#</th>
+            <th>@Html.DisplayNameFor(model => model.Employee)</th>
+            <th>@Html.DisplayNameFor(model => model.AbsenceReason)</th>
+            <th>@Html.DisplayNameFor(model => model.StartDate)</th>
+            <th>@Html.DisplayNameFor(model => model.EndDate)</th>
+            <th>@Html.DisplayNameFor(Model => Model.Comment)</th>
+            <th>@Html.DisplayNameFor(model => model.Status)</th>
+            <th class="col-sm-1"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int index = 1;
+        }
+        @foreach (var item in Model)
+        {
+            <tr class="align-middle">
+                @{
+                    var comment = item.Comment;
+
+                    const int maxLength = 150;
+
+                    if (comment?.Length > maxLength)
+                    {
+                        int lastSpace = comment.LastIndexOf(' ', maxLength);
+                        if (lastSpace != -1)
+                        {
+                            comment = comment.Substring(0, lastSpace) + " ...";
+                        }
+                        else
+                        {
+                            comment = comment.Substring(0, maxLength) + " ...";
+                        }
+                    }
+                }
+
+                <td class="text-center">
+                    @(index++).
+                </td>
+                <td>@Html.DisplayFor(modelItem => item.Employee.FullName)</td>
+                <td class="text-center">@Html.DisplayFor(modelItem => item.AbsenceReason.Name)</td>
+                <td class="text-center">@Html.DisplayFor(modelItem => item.StartDate)</td>
+                <td class="text-center">@Html.DisplayFor(modelItem => item.EndDate)</td>
+                <td>@comment</td>
+                <td class="text-center">@Html.DisplayFor(modelItem => item.Status)</td>
+                <td style="white-space: nowrap;">
+                    <div class="d-flex align-items-center">
+                        <a asp-action="." asp-route-id="@item.ID" class="btn btn-secondary me-1"><i class="bi bi-file-text"></i></a>
+                        @if (item.Status != Status.New)
+                        {
+                            <form asp-action="Submit" asp-route-id="@item.ID" method="post">
+                                <button type="submit" class="btn btn-success me-1"><i class="bi bi-check2"></i></button>
+                            </form>
+                            <form asp-action="Cancel" asp-route-id="@item.ID" method="post">
+                                <button type="submit" class="btn btn-danger me-1"><i class="bi bi-x-circle"></i></button>
+                            </form>
+                        }
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<nav aria-label="Page navigation">
+    @if (ViewBag.TotalPages > 1)
+    {
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link" aria-label="Previous" href="@Url.Action("GetEmployee", new{page = ViewBag.CurrentPage - 1})">&laquo;</a>
+            </li>
+            <li class="page-item @(1 == ViewBag.CurrentPage ? "active":"")">
+                <a class="page-link" href=@Url.Action("GetEmployee", new {page = 1})>1</a>
+            </li>
+            @if (ViewBag.CurrentPage > 3)
+            {
+                <li class="page-item disabled">
+                    <a class="page-link">...</a>
+                </li>
+            }
+            @for (int i = Math.Max(2, ViewBag.CurrentPage - 1); i < Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("GetEmployee", new { page = i })">@i</a>
+                </li>
+            }
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages - 2)
+            {
+                <li class="page-item disabled">
+                    <a class="page-link">...</a>
+                </li>
+            }
+
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "active":"")">
+                <a class="page-link" href=@Url.Action("GetEmployee", new {page = ViewBag.TotalPages})>@(ViewBag.TotalPages)</a>
+            </li>
+
+
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("GetEmployee", new { page = ViewBag.CurrentPage + 1 })" aria-label="Next">
+                    &raquo;
+                </a>
+            </li>
+
+        </ul>
+    }
+</nav>
