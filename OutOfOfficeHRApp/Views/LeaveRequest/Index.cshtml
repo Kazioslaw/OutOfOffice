@@ -34,7 +34,7 @@
 
                     const int maxLength = 150;
 
-                    if (comment.Length > maxLength)
+                    if (comment?.Length > maxLength)
                     {
                         int lastSpace = comment.LastIndexOf(' ', maxLength);
                         if (lastSpace != -1)
@@ -52,20 +52,25 @@
                     @(index++).
                 </td>
                 <td>@Html.DisplayFor(modelItem => item.Employee.FullName)</td>
-                <td>@Html.DisplayFor(modelItem => item.AbsenceReason.Name)</td>
+                <td class="text-center">@Html.DisplayFor(modelItem => item.AbsenceReason.Name)</td>
                 <td class="text-center">@Html.DisplayFor(modelItem => item.StartDate)</td>
                 <td class="text-center">@Html.DisplayFor(modelItem => item.EndDate)</td>
                 <td>@comment</td>
                 <td class="text-center">@Html.DisplayFor(modelItem => item.Status)</td>
-                <td>
-                    @if (item.Status == Status.New)
-                    {
-                        <a asp-action="Submit" asp-route-id="@item.ID" class="btn btn-secondary"><i class="bi bi-check2"></i></a>
-                        <a asp-action="Cancel" asp-route-id="@item.ID" class="btn btn-danger"><i class="bi bi-x-circle"></i></a>
-                    }
+                <td style="white-space: nowrap;">
+                    <div class="d-flex align-items-center">
+                        <a asp-action="." asp-route-id="@item.ID" class="btn btn-secondary me-1"><i class="bi bi-file-text"></i></a>
+                        @if (item.Status != Status.New)
+                        {
+                            <form asp-action="Submit" asp-route-id="@item.ID" method="post">
+                                <button type="submit" class="btn btn-success me-1"><i class="bi bi-check2"></i></button>
+                            </form>
+                            <form asp-action="Cancel" asp-route-id="@item.ID" method="post">
+                                <button type="submit" class="btn btn-danger me-1"><i class="bi bi-x-circle"></i></button>
+                            </form>
+                        }
+                    </div>
                 </td>
-
-
             </tr>
         }
     </tbody>

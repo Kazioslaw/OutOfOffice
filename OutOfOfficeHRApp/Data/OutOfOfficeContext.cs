@@ -63,6 +63,12 @@ namespace OutOfOfficeHRApp.Data
                         .HasForeignKey(e => e.PositionID)
                         .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<Employee>()
+                        .HasOne(e => e.Project)
+                        .WithMany()
+                        .HasForeignKey(e => e.ProjectID)
+                        .OnDelete(DeleteBehavior.NoAction);
+
             modelBuilder.Entity<LeaveRequest>()
                         .HasOne(lr => lr.Employee)
                         .WithMany()
@@ -86,6 +92,17 @@ namespace OutOfOfficeHRApp.Data
                         .WithOne()
                         .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<Project>()
+                        .HasOne(p => p.ProjectManager)
+                        .WithMany()
+                        .HasForeignKey(p => p.ProjectManagerID)
+                        .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Project>()
+                        .HasMany(p => p.Employees)
+                        .WithOne(e => e.Project)
+                        .HasForeignKey(e => e.ProjectID)
+                        .OnDelete(DeleteBehavior.NoAction);
         }
 
     }

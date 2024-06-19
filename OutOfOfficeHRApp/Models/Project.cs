@@ -17,9 +17,10 @@ namespace OutOfOfficeHRApp.Models
         public DateOnly EndDate { get; set; }
         [Required]
         [Display(Name = "Project Manager")]
-        public int EmployeeID { get; set; }
+        public int ProjectManagerID { get; set; }
         public Employee ProjectManager { get; set; }
         public string? Comment { get; set; }
+        public ICollection<Employee> Employees { get; set; }
         [Required]
         [Display(Name = "Status")]
         [DisplayFormat(DataFormatString = "{0:Active/Inactive}")]

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OutOfOfficeHRApp.Data;
 
@@ -11,9 +12,11 @@ using OutOfOfficeHRApp.Data;
 namespace OutOfOfficeHRApp.Data.Migrations
 {
     [DbContext(typeof(OutOfOfficeContext))]
-    partial class OutOfOfficeContextModelSnapshot : ModelSnapshot
+    [Migration("20240618055313_AddedProjectToEmployeeAndRelationsBetween")]
+    partial class AddedProjectToEmployeeAndRelationsBetween
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

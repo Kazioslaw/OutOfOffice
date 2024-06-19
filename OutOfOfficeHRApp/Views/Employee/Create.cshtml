@@ -25,18 +25,21 @@
                 <select asp-for="SubdivisionID" class="form-control" asp-items="ViewBag.Subdivision">
                     <option value="" hidden>Select subdivision</option>
                 </select>
+                <input asp-for="Subdivision" type="hidden" />
             </div>
             <div class="form-group d-flex align-items-center my-3">
                 <label asp-for="PositionID" class="control-label col-sm-2"></label>
                 <select asp-for="PositionID" class="form-control" asp-items="ViewBag.Position">
                     <option value="" hidden>Select position</option>
                 </select>
+                <input asp-for="Position" type="hidden" />
             </div>
             <div class="form-group d-flex align-items-center my-3">
                 <label asp-for="PeoplePartnerID" class="control-label col-sm-2"></label>
                 <select asp-for="PeoplePartnerID" class="form-control" asp-items="ViewBag.PeoplePartner">
                     <option value="" hidden>Select manager name</option>
                 </select>
+                <input asp-for="PeoplePartner" type="hidden" />
             </div>
             <div class="form-group d-flex align-items-center my-3">
                 <label asp-for="OutOfOfficeBalance" class="control-label col-sm-2"></label>

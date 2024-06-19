@@ -27,14 +27,35 @@ namespace OutOfOfficeHRApp.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
 
-            IEnumerable<Employee> employees = await _context.Employee.Skip((page - 1) * pageSize).Take(pageSize)
-                      .Include(e => e.Subdivision)
-                      .Include(e => e.Position).ToListAsync();
+            var employees = await _context.Employee
+                                          .Skip((page - 1) * pageSize)
+                                          .Take(pageSize)
+                                          .Include(e => e.Subdivision)
+                                          .Include(e => e.Position)
+                                          .ToListAsync();
 
 
 
             return View("Index", employees);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetEmployeeDetails(int id)
+        {
+            var employee = await _context.Employee
+                                         .Include(e => e.PeoplePartner)
+                                         .Include(e => e.Subdivision)
+                                         .Include(e => e.Position)
+                                         .Include(e => e.Project)
+                                         .FirstOrDefaultAsync(e => e.ID == id);
+            if (employee == null)
+            {
+                NotFound();
+                return RedirectToAction("Index");
+            }
+            return View("Details", employee);
+        }
+
 
         [HttpGet("Create")]
         public IActionResult AddEmployee()
@@ -48,8 +69,13 @@ namespace OutOfOfficeHRApp.Controllers
         }
 
         [HttpPost("Create")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddEmployee(Employee employee)
         {
+            ModelState.Remove("Position");
+            ModelState.Remove("Subdivision");
+            ModelState.Remove("PeoplePartner");
+            ModelState.Remove("Project");
             if (employee.Photo != null && employee.Photo.Length > 0)
             {
                 var uploadDirectory = Path.Combine(_environment.WebRootPath, "images", "EmployeePhotos");
@@ -68,18 +94,10 @@ namespace OutOfOfficeHRApp.Controllers
                 employee.PhotoPath = "/images/EmployeePhotos/" + fileName;
             }
 
-            var partnerID = employee.PeoplePartnerID;
-            var subdivisionID = employee.SubdivisionID;
-            var positionID = employee.PositionID;
+            employee.PeoplePartner = await _context.Employee.FindAsync(employee.PeoplePartnerID);
+            employee.Subdivision = await _context.Subdivision.FindAsync(employee.SubdivisionID);
+            employee.Position = await _context.Position.FindAsync(employee.PositionID);
             employee.IsActive = true;
-
-            employee.PeoplePartner = await _context.Employee.FindAsync(partnerID);
-            employee.Subdivision = await _context.Subdivision.FindAsync(subdivisionID);
-            employee.Position = await _context.Position.FindAsync(positionID);
-
-            ModelState.Remove("Position");
-            ModelState.Remove("Subdivision");
-            ModelState.Remove("PeoplePartner");
 
             if (ModelState.IsValid)
             {
@@ -87,7 +105,19 @@ namespace OutOfOfficeHRApp.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(GetEmployee));
             }
-            return View("Create", employee);
+            Console.WriteLine("Error. Employee: ");
+            Console.WriteLine($"\t{employee.ID}");
+            Console.WriteLine($"\t{employee.FullName}");
+            Console.WriteLine($"\t{employee.SubdivisionID}");
+            Console.WriteLine($"\t{employee.Subdivision.Name}");
+            Console.WriteLine($"\t{employee.PositionID}");
+            Console.WriteLine($"\t{employee.Position.Name}");
+            Console.WriteLine($"\t{employee.PeoplePartnerID}");
+            Console.WriteLine($"\t{employee.PeoplePartner.FullName}");
+            Console.WriteLine($"\t{employee.IsActive}");
+            Console.WriteLine($"\t{employee.OutOfOfficeBalance}");
+            Console.WriteLine($"\t{employee.PhotoPath}");
+            return View("Create");
         }
 
         [HttpGet("Edit/{id}")]
@@ -102,6 +132,7 @@ namespace OutOfOfficeHRApp.Controllers
         }
 
         [HttpPost("Edit/{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditEmployee(int id, Employee employee)
         {
             var existingEmployee = _context.Employee.FirstOrDefault(e => e.ID == id);
@@ -147,6 +178,7 @@ namespace OutOfOfficeHRApp.Controllers
             existingEmployee.FullName = employee.FullName;
             existingEmployee.SubdivisionID = employee.SubdivisionID;
             existingEmployee.PositionID = employee.PositionID;
+            existingEmployee.ProjectID = employee.ProjectID;
             existingEmployee.IsActive = employee.IsActive;
             existingEmployee.OutOfOfficeBalance = employee.OutOfOfficeBalance;
 
@@ -162,19 +194,23 @@ namespace OutOfOfficeHRApp.Controllers
         }
 
 
-        [HttpGet("Deactivate/{id}")]
-
-        public IActionResult Deactivate(int id)
+        [HttpPost("Activate/{id}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Activate(int id)
         {
-            var employee = _context.Employee.Include(e => e.Subdivision).Include(e => e.Position).Include(e => e.PeoplePartner).FirstOrDefault(e => e.ID == id);
-            return View("Deactivate", employee);
+            var employee = await _context.Employee.FindAsync(id);
+            employee.IsActive = true;
+            _context.Employee.Update(employee);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(GetEmployee));
         }
+
 
         [HttpPost("Deactivate/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeactivateEmployee(int id)
         {
-            var employee = _context.Employee.Include(e => e.Subdivision).Include(e => e.Position).Include(e => e.PeoplePartner).FirstOrDefault();
+            var employee = await _context.Employee.FindAsync(id);
             if (employee == null)
             {
                 return NotFound();

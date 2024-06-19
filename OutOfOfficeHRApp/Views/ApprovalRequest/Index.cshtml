@@ -49,12 +49,26 @@
 
                 <td class="text-center">@(index++).</td>
                 <td>@Html.DisplayFor(modelItem => item.Employee.FullName)</td>
-                <td>Employee: @Html.DisplayFor(modelItem => item.LeaveRequest.Employee.FullName). Start Date: @Html.DisplayFor(modelItem => item.LeaveRequest.StartDate) </td>
+                <td>
+                    <div class="row">
+                        Request: @Html.DisplayFor(modelItem => item.LeaveRequestID),
+                        Employee: @Html.DisplayFor(modelItem => item.LeaveRequest.Employee.FullName),
+                        Start Date: @Html.DisplayFor(modelItem => item.LeaveRequest.StartDate)
+                    </div>
+                </td>
                 <td>@comment</td>
                 <td class="text-center">@Html.DisplayFor(modelItem => item.Status)</td>
-                <td>
-                    <a asp-action="Approve" class="btn btn-secondary"><i class="bi bi-file-earmark-check"></i></a>
-                    <a asp-action="Reject" class="btn btn-danger"><i class="bi bi-file-earmark-excel"></i></a>
+                <td style="white-space: nowrap;">
+                    <div class="d-flex align-items-center">
+                        <a asp-action="." asp-route-id="@item.ID" class="btn btn-secondary me-1"><i class="bi bi-file-text"></i></a>
+                        @if (item.Status == Status.New)
+                        {
+                            <form asp-action="ApproveRequest" asp-route-id="@item.ID" method="post">
+                                <button type="submit" class="btn btn-success me-1"><i class="bi bi-file-earmark-check"></i></button>
+                            </form>
+                            <a asp-route-id="@item.ID" asp-action="Reject" class="btn btn-danger me-1"><i class="bi bi-file-earmark-x"></i></a>
+                        }
+                    </div>
                 </td>
             </tr>
         }

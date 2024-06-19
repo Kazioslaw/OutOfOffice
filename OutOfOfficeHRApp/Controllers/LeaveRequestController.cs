@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using OutOfOfficeHRApp.Data;
 using OutOfOfficeHRApp.Models;
-using static OutOfOfficeHRApp.Utilities;
 
 namespace OutOfOfficeHRApp.Controllers
 {
@@ -31,12 +30,13 @@ namespace OutOfOfficeHRApp.Controllers
 
         [HttpGet("{id}")]
 
-        public async Task<IActionResult> GetLeaveRequest(int id)
+        public async Task<IActionResult> GetLeaveDetails(int id)
         {
             var leaveRequest = await _context.LeaveRequest.Include(lr => lr.Employee).Include(lr => lr.AbsenceReason).FirstOrDefaultAsync(lr => lr.ID == id);
             if (leaveRequest == null)
             {
-                return NotFound();
+                NotFound();
+                return RedirectToAction("Index");
             }
             return Ok(leaveRequest);
         }
@@ -51,9 +51,18 @@ namespace OutOfOfficeHRApp.Controllers
         }
 
         [HttpPost("Create")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddLeaveRequest(LeaveRequest leaveRequest)
         {
             leaveRequest.Status = Status.New;
+            var employee = await _context.Employee.FindAsync(leaveRequest.EmployeeID);
+            var absenceReason = await _context.AbsenceReason.FindAsync(leaveRequest.AbsenceReasonID);
+            if (employee == null || absenceReason == null)
+            {
+                return NotFound();
+            }
+            leaveRequest.Employee = employee;
+            leaveRequest.AbsenceReason = absenceReason;
             _context.Add(leaveRequest);
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
@@ -66,6 +75,7 @@ namespace OutOfOfficeHRApp.Controllers
         }
 
         [HttpPost("Submit/{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitRequest(int id)
         {
             var leaveRequest = await _context.LeaveRequest.FindAsync(id);
@@ -78,6 +88,7 @@ namespace OutOfOfficeHRApp.Controllers
             {
                 LeaveRequest = leaveRequest,
                 EmployeeID = await _context.Employee.Where(lr => lr.Position.Name == "HR Manager").Select(lr => lr.ID).FirstOrDefaultAsync(),
+                Status = Status.New
             };
             _context.Update(leaveRequest);
             _context.Add(approvalRequest);
@@ -94,6 +105,7 @@ namespace OutOfOfficeHRApp.Controllers
         }
 
         [HttpPost("Cancel/{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CancelRequest(int id)
         {
             var leaveRequest = await _context.LeaveRequest.FindAsync(id);

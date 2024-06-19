@@ -25,6 +25,8 @@ namespace OutOfOfficeHRApp.Models
         [Display(Name = "HR Manager")]
         public int? PeoplePartnerID { get; set; }
         public Employee? PeoplePartner { get; set; }
+        public int? ProjectID { get; set; }
+        public Project Project { get; set; }
         [Required]
         [Display(Name = "Days off")]
         public int OutOfOfficeBalance { get; set; }

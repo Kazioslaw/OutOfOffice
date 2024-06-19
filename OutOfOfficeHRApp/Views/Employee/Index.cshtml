@@ -71,9 +71,27 @@
                 <td class="text-center">
                     <img src="@(item.PhotoPath != null ? item.PhotoPath : "http://placehold.it/48x48/")" style="width: 48px; height: 48px" />
                 </td>
-                <td class="col-sm-1">
-                    <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-secondary"><i class="bi bi-pencil"></i></a>
-                    <a asp-action="Deactivate" asp-route-id="@item.ID" class="btn btn-danger"><i class="bi bi-person-slash"></i></a>
+                <td style="white-space: nowrap;">
+                    <div class="d-flex align-items-center">
+                        <a asp-action="." asp-route-id="@item.ID" class="btn btn-secondary me-1"><i class="bi bi-file-text"> </i></a>
+                        <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-outline-primary me-1"><i class="bi bi-pencil"></i></a>
+                        @if (item.IsActive)
+                        {
+                            <form asp-action="Deactivate" asp-route-id="@item.ID" method="post">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-person-slash"></i>
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="Activate" asp-route-id="@item.ID" method="post">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-person-check"></i>
+                                </button>
+                            </form>
+                        }
+                    </div>
                 </td>
             </tr>
         }
