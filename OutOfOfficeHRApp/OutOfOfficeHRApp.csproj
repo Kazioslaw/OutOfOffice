@@ -7,6 +7,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="wwwroot\images\**" />
+	  <Content Remove="wwwroot\images\**" />
+	  <EmbeddedResource Remove="wwwroot\images\**" />
+	  <None Remove="wwwroot\images\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
 			<PrivateAssets>all</PrivateAssets>
@@ -22,8 +29,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="wwwroot\images\EmployeePhotos\" />
-		<Folder Include="wwwroot\images\" />
+	  <UpToDateCheckInput Remove="Views\Employee\Details.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <_ContentIncludedByDefault Remove="Views\Employee\Details.cshtml" />
 	</ItemGroup>
 
 </Project>

@@ -29,55 +29,6 @@ const getCsrfToken = () => {
     return tokenCookie ? tokenCookie.split('=')[1] : '';
 }
 
-//const sortTable = () => {
-//    $('th').on('click', function () {
-//        var column = $(this).data('column');
-//        var index = $(this).index();
-//        var order = $(this).data('order')
-//        console.log(column, index, order)
-
-//        if (order == 'asc') {
-//            $(this).data('order', 'desc').text($(this).text() + ' ▲')
-//            "▼▲"
-//        }
-//        else if (order == 'desc') {
-//            $(this).data('order', '').text($(this).text().replace(' ▲', ' ▼'))
-//        }
-//        else {
-//            $(this).data('order', 'asc').text($(this).text().replace(' ▼', ''))
-//        }
-
-//        var tbody = $('tbody')
-//        var rows = $(tbody).find('tr').toArray();
-
-//        rows.sort(function (rowA, rowB) {
-//            var valueA = $(rowA).find('td').eq(index).text().trim();
-//            var valueB = $(rowB).find('td').eq(index).text().trim();
-
-//            if ($.isNumeric(valueA) && $.isNumeric(valueB)) {
-//                valueA = parseFloat(valueA);
-//                valueB = parseFloat(valueB);
-//            }
-//            if (order == 'asc') {
-//                return valueA > valueB ? 1 : valueA < valueB ? -1 : 0
-//            }
-//            else if (order == 'desc') {
-//                return valueA < valueB ? 1 : valueA > valueB ? -1 : 0
-//            }
-
-//        })
-
-//        if (order !== 'asc' && order !== 'desc') {
-//            rows.sort(function (rowA, rowB) {
-//                var valueA = $(rowA).find('td').eq(0).text().trim();
-//                var valueB = $(rowB).find('td').eq(0).text().trim();
-//                return parseFloat(valueA) - parseFloat(valueB);
-//            });
-//        }
-//        tbody.empty().append(rows);
-//    })
-//}
-
 const sortTable = () => {
     const headers = document.querySelectorAll('th');
 

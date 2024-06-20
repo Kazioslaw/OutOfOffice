@@ -32,6 +32,7 @@ namespace OutOfOfficeHRApp.Controllers
                                           .Take(pageSize)
                                           .Include(e => e.Subdivision)
                                           .Include(e => e.Position)
+                                          .Include(e => e.PeoplePartner)
                                           .ToListAsync();
 
 
@@ -105,18 +106,6 @@ namespace OutOfOfficeHRApp.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(GetEmployee));
             }
-            Console.WriteLine("Error. Employee: ");
-            Console.WriteLine($"\t{employee.ID}");
-            Console.WriteLine($"\t{employee.FullName}");
-            Console.WriteLine($"\t{employee.SubdivisionID}");
-            Console.WriteLine($"\t{employee.Subdivision.Name}");
-            Console.WriteLine($"\t{employee.PositionID}");
-            Console.WriteLine($"\t{employee.Position.Name}");
-            Console.WriteLine($"\t{employee.PeoplePartnerID}");
-            Console.WriteLine($"\t{employee.PeoplePartner.FullName}");
-            Console.WriteLine($"\t{employee.IsActive}");
-            Console.WriteLine($"\t{employee.OutOfOfficeBalance}");
-            Console.WriteLine($"\t{employee.PhotoPath}");
             return View("Create");
         }
 
@@ -179,7 +168,6 @@ namespace OutOfOfficeHRApp.Controllers
             existingEmployee.SubdivisionID = employee.SubdivisionID;
             existingEmployee.PositionID = employee.PositionID;
             existingEmployee.ProjectID = employee.ProjectID;
-            existingEmployee.IsActive = employee.IsActive;
             existingEmployee.OutOfOfficeBalance = employee.OutOfOfficeBalance;
 
 
