@@ -37,11 +37,13 @@ namespace OutOfOfficeHRApp.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProject(int id)
         {
+
             var project = await _context.Project
                                         .Include(p => p.ProjectManager)
                                         .Include(p => p.ProjectType)
                                         .Include(p => p.Employees)
                                         .FirstOrDefaultAsync(p => p.ID == id);
+
             if (project == null)
             {
                 return NotFound();
@@ -71,6 +73,7 @@ namespace OutOfOfficeHRApp.Controllers
         [HttpGet("Edit/{id}")]
         public async Task<IActionResult> UpdateProject(int id)
         {
+            ViewBag.AllEmployees = CreateSelectList(_context.Employee, "ID", "FullName");
             ViewBag.ProjectManager = CreateSelectList(_context.Employee.Where(e => e.Position.Name == "Project Manager"), "ID", "FullName");
             ViewBag.ProjectType = CreateSelectList(_context.ProjectType, "ID", "Name");
             var project = await _context.Project
@@ -83,12 +86,24 @@ namespace OutOfOfficeHRApp.Controllers
 
         [HttpPost("Edit/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProject(int id, Project project)
+        public async Task<IActionResult> UpdateProject(int id, Project project, List<int> SelectedEmployees)
         {
             var existingProject = await _context.Project.FirstOrDefaultAsync(p => p.ID == id);
             if (existingProject == null)
             {
                 return NotFound();
+            }
+            existingProject.Employees.Clear();
+            if (SelectedEmployees != null)
+            {
+                foreach (var empId in SelectedEmployees)
+                {
+                    var employee = await _context.Employee.FindAsync(empId);
+                    if (employee != null)
+                    {
+                        existingProject.Employees.Add(employee);
+                    }
+                }
             }
             existingProject.ProjectTypeID = project.ProjectTypeID;
             existingProject.StartDate = project.StartDate;
@@ -99,7 +114,7 @@ namespace OutOfOfficeHRApp.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpPost("{id}/Deactivate")]
+        [HttpPost("Deactivate/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeactivateProject(int id)
         {
@@ -115,7 +130,7 @@ namespace OutOfOfficeHRApp.Controllers
 
         }
 
-        [HttpPost("{id}/Activate")]
+        [HttpPost("Activate/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ActivateProject(int id)
         {

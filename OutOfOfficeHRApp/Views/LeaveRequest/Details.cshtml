@@ -5,7 +5,7 @@
 }
 
 <h1>Request details</h1>
-<hr />
+<br />
 <div>
     <dl class="row">
         <dt class="col-sm-2">
@@ -15,10 +15,10 @@
             @Html.DisplayFor(modelItem => modelItem.Employee.FullName)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.AbsenceReason)
+            @Html.DisplayNameFor(model => model.AbsenceReasonID)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(modelItem => modelItem.AbsenceReason)
+            @Html.DisplayFor(modelItem => modelItem.AbsenceReason.Name)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.StartDate)

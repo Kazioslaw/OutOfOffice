@@ -24,7 +24,8 @@ namespace OutOfOfficeHRApp.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
 
-            var leaveRequests = await _context.LeaveRequest.Include(lr => lr.Employee).Include(lr => lr.AbsenceReason).ToListAsync();
+            var leaveRequests = await _context.LeaveRequest.Skip((page - 1) * pageSize)
+                                          .Take(pageSize).Include(lr => lr.Employee).Include(lr => lr.AbsenceReason).ToListAsync();
             return View("Index", leaveRequests);
         }
 
@@ -38,7 +39,7 @@ namespace OutOfOfficeHRApp.Controllers
                 NotFound();
                 return RedirectToAction("Index");
             }
-            return Ok(leaveRequest);
+            return View("Details", leaveRequest);
         }
 
         [HttpGet("Create")]
@@ -84,10 +85,13 @@ namespace OutOfOfficeHRApp.Controllers
                 return NotFound();
             }
             leaveRequest.Status = Status.Submitted;
+            var hrManager = await _context.Employee.Where(lr => lr.Position.Name == "HR Manager").Select(lr => lr.ID).ToListAsync();
+            Random rnd = new Random();
+            var random = rnd.Next(hrManager.Count);
             var approvalRequest = new ApprovalRequest
             {
                 LeaveRequest = leaveRequest,
-                EmployeeID = await _context.Employee.Where(lr => lr.Position.Name == "HR Manager").Select(lr => lr.ID).FirstOrDefaultAsync(),
+                EmployeeID = hrManager[random],
                 Status = Status.New
             };
             _context.Update(leaveRequest);

@@ -29,11 +29,11 @@
                 </div>
                 <div class="form-group d-flex align-items-center my-3">
                     <label asp-for="StartDate" class="control-label col-sm-2"></label>
-                    <input type="date" asp-for="StartDate" class="form-control" />
+                    <input type="date" min="1999-01-01" max="2050-12-31" asp-for="StartDate" class="form-control" />
                 </div>
                 <div class="form-group d-flex align-items-center my-3">
                     <label asp-for="EndDate" class="control-label col-sm-2"></label>
-                    <input type="date" asp-for="EndDate" class="form-control" />
+                    <input type="date" min="1999-01-01" max="2050-12-31" asp-for="EndDate" class="form-control" />
                 </div>
                 <div class="form-group d-flex align-items-center my-3">
                     <label asp-for="Comment" class="control-label col-sm-2"></label>

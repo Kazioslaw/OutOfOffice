@@ -73,16 +73,26 @@
                 </td>
                 <td clss="text-center">@(item.IsActive ? "Active" : "Inactive")</td>
                 <td style="white-space: nowrap;">
-                    <a asp-action="." asp-route-id="@item.ID" class="btn btn-secondary"><i class="bi bi-file-text"></i></a>
-                    <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-outline-primary"><i class="bi bi-pencil"></i></a>
-                    @if (item.IsActive)
-                    {
-                        <a asp-action="Deactivate" asp-route-id="@item.ID" class="btn btn-danger"><i class="bi bi-x-circle"></i></a>
-                    }
-                    else
-                    {
-                        <a asp-action="Activate" asp-route-id="@item.ID" class="btn btn-success"><i class="bi bi-check-circle"></i></a>
-                    }
+                    <div class="d-flex align-items-center">
+                        <a asp-action="." asp-route-id="@item.ID" class="btn btn-secondary me-1"><i class="bi bi-file-text"></i></a>
+                        <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-outline-primary me-1"><i class="bi bi-pencil"></i></a>
+                        @if (item.IsActive)
+                        {
+                            <form asp-route-id="@item.ID" asp-action="Deactivate" method="post">
+                                <button type="submit" class="btn btn-danger me-1">
+                                    <i class="bi bi-person-slash"></i>
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-route-id="@item.ID" asp-action="Activate" method="post">
+                                <button type="submit" class="btn btn-success me-1">
+                                    <i class="bi bi-person-check"></i>
+                                </button>
+                            </form>
+                        }
+                    </div>
                 </td>
             </tr>
         }
@@ -94,10 +104,10 @@
     {
         <ul class="pagination justify-content-center">
             <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
-                <a class="page-link" aria-label="Previous" href="@Url.Action("GetEmployee", new{page = ViewBag.CurrentPage - 1})">&laquo;</a>
+                <a class="page-link" aria-label="Previous" href="@Url.Action("GetProjects", new{page = ViewBag.CurrentPage - 1})">&laquo;</a>
             </li>
             <li class="page-item @(1 == ViewBag.CurrentPage ? "active":"")">
-                <a class="page-link" href=@Url.Action("GetEmployee", new {page = 1})>1</a>
+                <a class="page-link" href=@Url.Action("GetProjects", new {page = 1})>1</a>
             </li>
             @if (ViewBag.CurrentPage > 3)
             {
@@ -108,7 +118,7 @@
             @for (int i = Math.Max(2, ViewBag.CurrentPage - 1); i < Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
             {
                 <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link" href="@Url.Action("GetEmployee", new { page = i })">@i</a>
+                    <a class="page-link" href="@Url.Action("GetProjects", new { page = i })">@i</a>
                 </li>
             }
 
@@ -120,12 +130,12 @@
             }
 
             <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "active":"")">
-                <a class="page-link" href=@Url.Action("GetEmployee", new {page = ViewBag.TotalPages})>@(ViewBag.TotalPages)</a>
+                <a class="page-link" href=@Url.Action("GetProjects", new {page = ViewBag.TotalPages})>@(ViewBag.TotalPages)</a>
             </li>
 
 
             <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
-                <a class="page-link" href="@Url.Action("GetEmployee", new { page = ViewBag.CurrentPage + 1 })" aria-label="Next">
+                <a class="page-link" href="@Url.Action("GetProjects", new { page = ViewBag.CurrentPage + 1 })" aria-label="Next">
                     &raquo;
                 </a>
             </li>
