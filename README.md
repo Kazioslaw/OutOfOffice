@@ -12,7 +12,7 @@ To create and populate the database, follow these steps:
    ```
 If you encounter an error, you may need to install Entity Framework Tools. To install, run this command in PowerShell:
   ```shell
-  dotnet tool installl --global dotnet-ef
+  dotnet tool install --global dotnet-ef
 ```
 
 ## Running the application
