@@ -59,12 +59,11 @@ namespace OutOfOfficeHRApp.Controllers
 			{
 				return NotFound();
 			}
-			var leaveRequest = await _context.LeaveRequest.FindAsync(approval.LeaveRequestID);
+			var leaveRequest = await _context.LeaveRequest.FirstOrDefaultAsync(lr => lr.ID == approval.LeaveRequestID);
 			var endDays = approval.LeaveRequest.EndDate.DayNumber;
 			var employee = await _context.Employee.FirstOrDefaultAsync(e => e.ID == approval.EmployeeID);
-			if (employee == null)
+			if (employee == null || leaveRequest == null)
 			{
-				Console.WriteLine("EEEE nie ma pracownika?!");
 				return NotFound();
 			}
 			if (leaveRequest == null) { return NotFound(); }
@@ -90,13 +89,13 @@ namespace OutOfOfficeHRApp.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> RejectRequest(int id)
 		{
-			var approval = await _context.ApprovalRequest.FindAsync(id);
+			var approval = await _context.ApprovalRequest.FirstOrDefaultAsync(ar => ar.ID == id);
 			if (approval == null)
 			{
 				return NotFound();
 			}
 			approval.Status = Status.Rejected;
-			var leaveRequest = await _context.LeaveRequest.FindAsync(approval.LeaveRequestID);
+			var leaveRequest = await _context.LeaveRequest.FirstOrDefaultAsync(lr => lr.ID == approval.LeaveRequestID);
 			if (leaveRequest == null)
 			{
 				return NotFound();
