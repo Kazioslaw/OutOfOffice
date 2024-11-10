@@ -21,21 +21,41 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Employee" asp-action="Index"><i class="bi bi-person-fill"></i>Employee</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Project" asp-action="Index"><i class="bi bi-kanban-fill"></i> Project</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="LeaveRequest" asp-action="Index"><i class="bi bi-emoji-sunglasses-fill"></i> Holiday requests</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="ApprovalRequest" asp-action="Index"><i class="bi bi-calendar-check-fill"></i> Approvals</a>
-                        </li>
-                        </li>
-                    </ul>
+                    @if (User.IsInRole("Employee"))
+                    {
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="LeaveRequest" asp-action="Index"><i class="bi bi-emoji-sunglasses-fill"></i> Holiday requests</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            </li>
+                        </ul>
+
+
+                    }
+
+                    else
+                    {
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Employee" asp-action="Index"><i class="bi bi-person-fill"></i>Employee</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Project" asp-action="Index"><i class="bi bi-kanban-fill"></i> Project</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="LeaveRequest" asp-action="Index"><i class="bi bi-emoji-sunglasses-fill"></i> Holiday requests</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="ApprovalRequest" asp-action="Index"><i class="bi bi-calendar-check-fill"></i> Approvals</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            </li>
+                        </ul>
+                    }
+                    <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>

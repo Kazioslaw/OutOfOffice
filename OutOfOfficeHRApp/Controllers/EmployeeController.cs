@@ -1,4 +1,6 @@
 ﻿global using static OutOfOfficeHRApp.Utilities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OutOfOfficeHRApp.Data;
@@ -6,15 +8,18 @@ using OutOfOfficeHRApp.Models;
 
 namespace OutOfOfficeHRApp.Controllers
 {
+    [Authorize(Roles = "HR Manager, Project Manager, Admin")]
     [Route("[controller]")]
     public class EmployeeController : Controller
     {
         private readonly OutOfOfficeContext _context;
         private readonly IWebHostEnvironment _environment;
-        public EmployeeController(OutOfOfficeContext context, IWebHostEnvironment environment)
+        private readonly UserManager<User> _userManager;
+        public EmployeeController(OutOfOfficeContext context, IWebHostEnvironment environment, UserManager<User> userManager)
         {
             _context = context;
             _environment = environment;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -77,6 +82,7 @@ namespace OutOfOfficeHRApp.Controllers
             ModelState.Remove("Subdivision");
             ModelState.Remove("PeoplePartner");
             ModelState.Remove("Project");
+            ModelState.Remove("Email");
             if (employee.Photo != null && employee.Photo.Length > 0)
             {
                 var uploadDirectory = Path.Combine(_environment.WebRootPath, "images", "EmployeePhotos");
@@ -95,16 +101,58 @@ namespace OutOfOfficeHRApp.Controllers
                 employee.PhotoPath = "/images/EmployeePhotos/" + fileName;
             }
 
+            var username = await GenerateUsername(employee.FullName);
+            var email = $"{username.Replace("_", "").ToLower()}@site.com";
+
             employee.PeoplePartner = await _context.Employee.FindAsync(employee.PeoplePartnerID);
             employee.Subdivision = await _context.Subdivision.FindAsync(employee.SubdivisionID);
             employee.Position = await _context.Position.FindAsync(employee.PositionID);
             employee.IsActive = true;
+            employee.Email = email;
 
-            if (ModelState.IsValid)
+            var user = new User
             {
-                _context.Add(employee);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(GetEmployee));
+                UserName = username,
+                Email = email,
+                EmailConfirmed = true
+            };
+            var tempPassword = "P@ssword1";
+
+            var userResult = await _userManager.CreateAsync(user, tempPassword);
+
+            if (userResult.Succeeded)
+            {
+                if (employee.Position.Name == "Administrator")
+                {
+                    var roleResult = await _userManager.AddToRoleAsync(user, "Admin");
+                }
+                else
+                {
+                    var roleResult = await _userManager.AddToRoleAsync(user, $"{employee.Position.Name}");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        Console.WriteLine(error.ErrorMessage);
+                    }
+                }
+
+                if (ModelState.IsValid)
+                {
+                    _context.Add(employee);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(GetEmployee));
+                }
+            }
+
+            else
+            {
+                foreach (var error in userResult.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
             }
             return View("Create");
         }
@@ -161,15 +209,33 @@ namespace OutOfOfficeHRApp.Controllers
                     await employee.Photo.CopyToAsync(stream);
                 }
 
+
+
                 existingEmployee.PhotoPath = "/images/EmployeePhotos/" + fileName;
             }
 
+            var existingEmployeePosition = await _context.Position.Where(p => p.ID == existingEmployee.PositionID).Select(p => p.Name).FirstOrDefaultAsync();
+            var employeePosition = await _context.Position.Where(p => p.ID == employee.PositionID).Select(p => p.Name).FirstOrDefaultAsync();
             existingEmployee.FullName = employee.FullName;
             existingEmployee.SubdivisionID = employee.SubdivisionID;
             existingEmployee.PositionID = employee.PositionID;
             existingEmployee.ProjectID = employee.ProjectID;
+            existingEmployee.PeoplePartnerID = employee.PeoplePartnerID;
             existingEmployee.OutOfOfficeBalance = employee.OutOfOfficeBalance;
+            var user = await _userManager.FindByEmailAsync(existingEmployee.Email);
+            if (user != null && existingEmployeePosition != employeePosition)
+            {
+                var result = _userManager.RemoveFromRoleAsync(user, existingEmployee.PositionID.ToString());
 
+                if (employeePosition == "Administrator")
+                {
+                    var roleResult = await _userManager.AddToRoleAsync(user, "Admin");
+                }
+                else
+                {
+                    var roleResult = await _userManager.AddToRoleAsync(user, $"{employeePosition}");
+                }
+            }
 
             if (ModelState.IsValid)
             {
@@ -204,6 +270,8 @@ namespace OutOfOfficeHRApp.Controllers
                 return NotFound();
             }
             employee.IsActive = false;
+            var user = await _userManager.FindByNameAsync(employee.FullName.Replace(" ", "_"));
+            await _userManager.DeleteAsync(user);
             _context.Employee.Update(employee);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(GetEmployee));
@@ -235,6 +303,40 @@ namespace OutOfOfficeHRApp.Controllers
             }
 
             return Ok("Photo successfully removed");
+        }
+
+        public async Task<string> GenerateUsername(string fullName)
+        {
+            var baseUsername = fullName.Replace(" ", "_")
+                    .Replace("ą", "a")
+                    .Replace("ę", "ę")
+                    .Replace("ł", "l")
+                    .Replace("ń", "n")
+                    .Replace("ó", "o")
+                    .Replace("ś", "s")
+                    .Replace("ż", "z")
+                    .Replace("ź", "z")
+                    .Replace("Ą", "A")
+                    .Replace("Ę", "E")
+                    .Replace("Ł", "L")
+                    .Replace("Ń", "N")
+                    .Replace("Ó", "O")
+                    .Replace("Ś", "S")
+                    .Replace("Ż", "Z")
+                    .Replace("Ź", "Z");
+
+            var username = baseUsername;
+            int counter = 1;
+            var userExist = await _userManager.FindByNameAsync(username) != null;
+
+            while (userExist)
+            {
+                username = $"{baseUsername}{counter}";
+                counter++;
+                userExist = await _userManager.FindByNameAsync(username) != null;
+            }
+
+            return username;
         }
     }
 }

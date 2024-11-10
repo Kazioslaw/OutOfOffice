@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using OutOfOfficeHRApp.Models;
 
 namespace OutOfOfficeHRApp.Data
 {
-    public class OutOfOfficeContext : DbContext
+    public class OutOfOfficeContext : IdentityDbContext<User, Role, string>
     {
         public OutOfOfficeContext(DbContextOptions<OutOfOfficeContext> options) : base(options) { }
 
@@ -18,6 +19,8 @@ namespace OutOfOfficeHRApp.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<AbsenceReason>().HasData(new AbsenceReason { ID = 1, Name = "Illness" },
                                                          new AbsenceReason { ID = 2, Name = "Family Matter" },
                                                          new AbsenceReason { ID = 3, Name = "Official Matter" },

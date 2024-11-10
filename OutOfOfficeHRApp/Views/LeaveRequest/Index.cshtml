@@ -29,53 +29,161 @@
             int pageSize = ViewBag.PageSize;
             int totalPages = ViewBag.TotalPages;
             int index = ((currentPage - 1) * pageSize + 1);
+            bool isEmployee = User.IsInRole("Employee");
+        }
+
+        @if (isEmployee)
+        {
+            @foreach (var item in Model)
+            {
+                @if (item.Employee.FullName.ToLower() == User.Identity.Name.Replace("_", ""))
+                {
+                    <tr class="align-middle">
+                        @{
+                            var comment = item.Comment;
+
+                            const int maxLength = 150;
+
+                            if (comment?.Length > maxLength)
+                            {
+                                int lastSpace = comment.LastIndexOf(' ', maxLength);
+                                if (lastSpace != -1)
+                                {
+                                    comment = comment.Substring(0, lastSpace) + " ...";
+                                }
+                                else
+                                {
+                                    comment = comment.Substring(0, maxLength) + " ...";
+                                }
+                            }
+                        }
+
+                        <td class="text-center">
+                            @(index++).
+                        </td>
+                        <td>@Html.DisplayFor(modelItem => item.Employee.FullName)</td>
+                        <td class="text-center">@Html.DisplayFor(modelItem => item.AbsenceReason.Name)</td>
+                        <td class="text-center">@Html.DisplayFor(modelItem => item.StartDate)</td>
+                        <td class="text-center">@Html.DisplayFor(modelItem => item.EndDate)</td>
+                        <td>@comment</td>
+                        <td class="text-center">@Html.DisplayFor(modelItem => item.Status)</td>
+                        <td style="white-space: nowrap;">
+                            <div class="d-flex align-items-center">
+                                <a asp-action="." asp-route-id="@item.ID" class="btn btn-secondary me-1"><i class="bi bi-file-text"></i></a>
+                                @if (item.Status == Status.New)
+                                {
+                                    <form asp-action="Submit" asp-route-id="@item.ID" method="post">
+                                        <button type="submit" class="btn btn-success me-1"><i class="bi bi-check2"></i></button>
+                                    </form>
+                                    <form asp-action="Cancel" asp-route-id="@item.ID" method="post">
+                                        <button type="submit" class="btn btn-danger me-1"><i class="bi bi-x-circle"></i></button>
+                                    </form>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
         }
         @foreach (var item in Model)
         {
-            <tr class="align-middle">
-                @{
-                    var comment = item.Comment;
+            if (isEmployee)
+            {
+                if (item.Employee.FullName.ToLower() == User.Identity.Name.ToLower().Replace("_", " "))
+                {
+                    <tr class="align-middle">
+                        @{
+                            var comment = item.Comment;
 
-                    const int maxLength = 150;
+                            const int maxLength = 150;
 
-                    if (comment?.Length > maxLength)
-                    {
-                        int lastSpace = comment.LastIndexOf(' ', maxLength);
-                        if (lastSpace != -1)
-                        {
-                            comment = comment.Substring(0, lastSpace) + " ...";
+                            if (comment?.Length > maxLength)
+                            {
+                                int lastSpace = comment.LastIndexOf(' ', maxLength);
+                                if (lastSpace != -1)
+                                {
+                                    comment = comment.Substring(0, lastSpace) + " ...";
+                                }
+                                else
+                                {
+                                    comment = comment.Substring(0, maxLength) + " ...";
+                                }
+                            }
                         }
-                        else
+
+                        <td class="text-center">
+                            @(index++).
+                        </td>
+                        <td>@Html.DisplayFor(modelItem => item.Employee.FullName)</td>
+                        <td class="text-center">@Html.DisplayFor(modelItem => item.AbsenceReason.Name)</td>
+                        <td class="text-center">@Html.DisplayFor(modelItem => item.StartDate)</td>
+                        <td class="text-center">@Html.DisplayFor(modelItem => item.EndDate)</td>
+                        <td>@comment</td>
+                        <td class="text-center">@Html.DisplayFor(modelItem => item.Status)</td>
+                        <td style="white-space: nowrap;">
+                            <div class="d-flex align-items-center">
+                                <a asp-action="." asp-route-id="@item.ID" class="btn btn-secondary me-1"><i class="bi bi-file-text"></i></a>
+                                @if (item.Status == Status.New)
+                                {
+                                    <form asp-action="Submit" asp-route-id="@item.ID" method="post">
+                                        <button type="submit" class="btn btn-success me-1"><i class="bi bi-check2"></i></button>
+                                    </form>
+                                    <form asp-action="Cancel" asp-route-id="@item.ID" method="post">
+                                        <button type="submit" class="btn btn-danger me-1"><i class="bi bi-x-circle"></i></button>
+                                    </form>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            if (!isEmployee)
+            {
+                <tr class="align-middle">
+                    @{
+                        var comment = item.Comment;
+
+                        const int maxLength = 150;
+
+                        if (comment?.Length > maxLength)
                         {
-                            comment = comment.Substring(0, maxLength) + " ...";
+                            int lastSpace = comment.LastIndexOf(' ', maxLength);
+                            if (lastSpace != -1)
+                            {
+                                comment = comment.Substring(0, lastSpace) + " ...";
+                            }
+                            else
+                            {
+                                comment = comment.Substring(0, maxLength) + " ...";
+                            }
                         }
                     }
-                }
 
-                <td class="text-center">
-                    @(index++).
-                </td>
-                <td>@Html.DisplayFor(modelItem => item.Employee.FullName)</td>
-                <td class="text-center">@Html.DisplayFor(modelItem => item.AbsenceReason.Name)</td>
-                <td class="text-center">@Html.DisplayFor(modelItem => item.StartDate)</td>
-                <td class="text-center">@Html.DisplayFor(modelItem => item.EndDate)</td>
-                <td>@comment</td>
-                <td class="text-center">@Html.DisplayFor(modelItem => item.Status)</td>
-                <td style="white-space: nowrap;">
-                    <div class="d-flex align-items-center">
-                        <a asp-action="." asp-route-id="@item.ID" class="btn btn-secondary me-1"><i class="bi bi-file-text"></i></a>
-                        @if (item.Status == Status.New)
-                        {
-                            <form asp-action="Submit" asp-route-id="@item.ID" method="post">
-                                <button type="submit" class="btn btn-success me-1"><i class="bi bi-check2"></i></button>
-                            </form>
-                            <form asp-action="Cancel" asp-route-id="@item.ID" method="post">
-                                <button type="submit" class="btn btn-danger me-1"><i class="bi bi-x-circle"></i></button>
-                            </form>
-                        }
-                    </div>
-                </td>
-            </tr>
+                    <td class="text-center">
+                        @(index++).
+                    </td>
+                    <td>@Html.DisplayFor(modelItem => item.Employee.FullName)</td>
+                    <td class="text-center">@Html.DisplayFor(modelItem => item.AbsenceReason.Name)</td>
+                    <td class="text-center">@Html.DisplayFor(modelItem => item.StartDate)</td>
+                    <td class="text-center">@Html.DisplayFor(modelItem => item.EndDate)</td>
+                    <td>@comment</td>
+                    <td class="text-center">@Html.DisplayFor(modelItem => item.Status)</td>
+                    <td style="white-space: nowrap;">
+                        <div class="d-flex align-items-center">
+                            <a asp-action="." asp-route-id="@item.ID" class="btn btn-secondary me-1"><i class="bi bi-file-text"></i></a>
+                            @if (item.Status == Status.New)
+                            {
+                                <form asp-action="Submit" asp-route-id="@item.ID" method="post">
+                                    <button type="submit" class="btn btn-success me-1"><i class="bi bi-check2"></i></button>
+                                </form>
+                                <form asp-action="Cancel" asp-route-id="@item.ID" method="post">
+                                    <button type="submit" class="btn btn-danger me-1"><i class="bi bi-x-circle"></i></button>
+                                </form>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
         }
     </tbody>
 </table>
@@ -85,10 +193,10 @@
     {
         <ul class="pagination justify-content-center">
             <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                <a class="page-link" aria-label="Previous" href="@Url.Action("GetLeaveRequests", new{page = currentPage - 1})">&laquo;</a>
+                <a class="page-link" aria-label="Previous" href="@Url.Action("Index", new{page = currentPage - 1})">&laquo;</a>
             </li>
             <li class="page-item @(1 == currentPage ? "active":"")">
-                <a class="page-link" href=@Url.Action("GetLeaveRequests", new {page = 1})>1</a>
+                <a class="page-link" href=@Url.Action("Index", new {page = 1})>1</a>
             </li>
             @if (currentPage > 3)
             {
@@ -99,7 +207,7 @@
             @for (int i = Math.Max(2, currentPage - 1); i < Math.Min(totalPages, currentPage + 2); i++)
             {
                 <li class="page-item @(i == currentPage ? "active" : "")">
-                    <a class="page-link" href="@Url.Action("GetLeaveRequests", new { page = i })">@i</a>
+                    <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
                 </li>
             }
 
@@ -111,12 +219,12 @@
             }
 
             <li class="page-item @(currentPage == totalPages ? "active":"")">
-                <a class="page-link" href=@Url.Action("GetLeaveRequests", new {page = totalPages})>@(totalPages)</a>
+                <a class="page-link" href=@Url.Action("Index", new {page = totalPages})>@(totalPages)</a>
             </li>
 
 
             <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-                <a class="page-link" href="@Url.Action("GetLeaveRequests", new { page = currentPage + 1 })" aria-label="Next">
+                <a class="page-link" href="@Url.Action("Index", new { page = currentPage + 1 })" aria-label="Next">
                     &raquo;
                 </a>
             </li>

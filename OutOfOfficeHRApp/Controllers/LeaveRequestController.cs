@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OutOfOfficeHRApp.Data;
 using OutOfOfficeHRApp.Models;
 
 namespace OutOfOfficeHRApp.Controllers
 {
+    [Authorize]
     [Route("[controller]")]
     public class LeaveRequestController : Controller
     {

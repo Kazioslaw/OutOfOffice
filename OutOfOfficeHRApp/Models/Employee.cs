@@ -34,5 +34,7 @@ namespace OutOfOfficeHRApp.Models
         public IFormFile? Photo { get; set; }
         [Display(Name = "Photo")]
         public string? PhotoPath { get; set; }
+
+        public string Email { get; set; }
     }
 }
