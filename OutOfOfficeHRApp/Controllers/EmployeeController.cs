@@ -252,7 +252,7 @@ namespace OutOfOfficeHRApp.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Activate(int id)
 		{
-			var employee = await _context.Employee.FirstOrDefaultAsync(id);
+			var employee = await _context.Employee.FirstOrDefaultAsync(e => e.ID == id);
 			employee.IsActive = true;
 			_context.Employee.Update(employee);
 			await _context.SaveChangesAsync();
@@ -264,7 +264,7 @@ namespace OutOfOfficeHRApp.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> DeactivateEmployee(int id)
 		{
-			var employee = await _context.Employee.FirstOrDefaultAsync(id);
+			var employee = await _context.Employee.FirstOrDefaultAsync(e => e.ID == id);
 			if (employee == null)
 			{
 				return NotFound();
@@ -281,7 +281,7 @@ namespace OutOfOfficeHRApp.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> RemovePhoto(int id)
 		{
-			var employee = await _context.Employee.FirstOrDefaultAsync(id);
+			var employee = await _context.Employee.FirstOrDefaultAsync(e => e.ID == id);
 
 			if (employee == null)
 			{
