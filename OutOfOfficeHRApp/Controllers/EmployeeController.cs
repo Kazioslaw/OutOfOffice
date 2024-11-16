@@ -1,5 +1,4 @@
-﻿global using static OutOfOfficeHRApp.Utilities;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +14,13 @@ namespace OutOfOfficeHRApp.Controllers
 		private readonly OutOfOfficeContext _context;
 		private readonly IWebHostEnvironment _environment;
 		private readonly UserManager<User> _userManager;
-		public EmployeeController(OutOfOfficeContext context, IWebHostEnvironment environment, UserManager<User> userManager)
+		private readonly Utilities _utilities;
+		public EmployeeController(OutOfOfficeContext context, IWebHostEnvironment environment, UserManager<User> userManager, Utilities utilities)
 		{
 			_context = context;
 			_environment = environment;
 			_userManager = userManager;
+			_utilities = utilities;
 		}
 
 		[HttpGet]
@@ -67,10 +68,10 @@ namespace OutOfOfficeHRApp.Controllers
 		public IActionResult AddEmployee()
 		{
 			var employee = new Employee();
-			ViewBag.Subdivision = CreateSelectList(_context.Subdivision, "ID", "Name");
-			ViewBag.Position = CreateSelectList(_context.Position, "ID", "Name");
-			ViewBag.PeoplePartner = CreateSelectList(_context.Employee.Where(e => e.Position.Name == "HR Manager"), "ID", "FullName");
-			ViewBag.Status = CreateSelectList(new[] { new { Value = true, Text = "Active" }, new { Value = false, Text = "Inactive" } }, "Value", "Text");
+			ViewBag.Subdivision = _utilities.CreateSelectList(_context.Subdivision, "ID", "Name");
+			ViewBag.Position = _utilities.CreateSelectList(_context.Position, "ID", "Name");
+			ViewBag.PeoplePartner = _utilities.CreateSelectList(_context.Employee.Where(e => e.Position.Name == "HR Manager"), "ID", "FullName");
+			ViewBag.Status = _utilities.CreateSelectList(new[] { new { Value = true, Text = "Active" }, new { Value = false, Text = "Inactive" } }, "Value", "Text");
 			return View("Create", employee);
 		}
 
@@ -101,7 +102,7 @@ namespace OutOfOfficeHRApp.Controllers
 				employee.PhotoPath = "/images/EmployeePhotos/" + fileName;
 			}
 
-			var username = await GenerateUsername(employee.FullName);
+			var username = await _utilities.GenerateUsername(employee.FullName);
 			var email = $"{username.Replace("_", "").ToLower()}@site.com";
 
 			employee.PeoplePartner = await _context.Employee.FirstOrDefaultAsync(e => e.ID == employee.PeoplePartnerID);
@@ -161,10 +162,10 @@ namespace OutOfOfficeHRApp.Controllers
 		public async Task<IActionResult> EditEmployee(int id)
 		{
 			var existingEmployee = await _context.Employee.Include(e => e.Subdivision).Include(e => e.Position).FirstOrDefaultAsync(e => e.ID == id);
-			ViewBag.Subdivision = CreateSelectList(_context.Subdivision, "ID", "Name");
-			ViewBag.Position = CreateSelectList(_context.Position, "ID", "Name");
-			ViewBag.PeoplePartner = CreateSelectList(_context.Employee.Where(e => e.Position.Name == "HR Manager"), "ID", "FullName");
-			ViewBag.Status = CreateSelectList(new[] { new { Value = true, Text = "Active" }, new { Value = false, Text = "Inactive" } }, "Value", "Text");
+			ViewBag.Subdivision = _utilities.CreateSelectList(_context.Subdivision, "ID", "Name");
+			ViewBag.Position = _utilities.CreateSelectList(_context.Position, "ID", "Name");
+			ViewBag.PeoplePartner = _utilities.CreateSelectList(_context.Employee.Where(e => e.Position.Name == "HR Manager"), "ID", "FullName");
+			ViewBag.Status = _utilities.CreateSelectList(new[] { new { Value = true, Text = "Active" }, new { Value = false, Text = "Inactive" } }, "Value", "Text");
 			return View("Edit", existingEmployee);
 		}
 
@@ -305,38 +306,5 @@ namespace OutOfOfficeHRApp.Controllers
 			return Ok("Photo successfully removed");
 		}
 
-		public async Task<string> GenerateUsername(string fullName)
-		{
-			var baseUsername = fullName.Replace(" ", "_")
-					.Replace("ą", "a")
-					.Replace("ę", "ę")
-					.Replace("ł", "l")
-					.Replace("ń", "n")
-					.Replace("ó", "o")
-					.Replace("ś", "s")
-					.Replace("ż", "z")
-					.Replace("ź", "z")
-					.Replace("Ą", "A")
-					.Replace("Ę", "E")
-					.Replace("Ł", "L")
-					.Replace("Ń", "N")
-					.Replace("Ó", "O")
-					.Replace("Ś", "S")
-					.Replace("Ż", "Z")
-					.Replace("Ź", "Z");
-
-			var username = baseUsername;
-			int counter = 1;
-			var userExist = await _userManager.FindByNameAsync(username) != null;
-
-			while (userExist)
-			{
-				username = $"{baseUsername}{counter}";
-				counter++;
-				userExist = await _userManager.FindByNameAsync(username) != null;
-			}
-
-			return username;
-		}
 	}
 }

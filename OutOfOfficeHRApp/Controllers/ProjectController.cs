@@ -11,10 +11,11 @@ namespace OutOfOfficeHRApp.Controllers
 	public class ProjectController : Controller
 	{
 		private readonly OutOfOfficeContext _context;
-
-		public ProjectController(OutOfOfficeContext context)
+		private readonly Utilities _utilities;
+		public ProjectController(OutOfOfficeContext context, Utilities utilities)
 		{
 			_context = context;
+			_utilities = utilities;
 		}
 
 		[HttpGet]
@@ -57,8 +58,8 @@ namespace OutOfOfficeHRApp.Controllers
 
 		public async Task<IActionResult> AddProject()
 		{
-			ViewBag.ProjectType = CreateSelectList(_context.ProjectType, "ID", "Name");
-			ViewBag.ProjectManager = CreateSelectList(_context.Employee.Where(e => e.Position.Name == "Project Manager"), "ID", "FullName");
+			ViewBag.ProjectType = _utilities.CreateSelectList(_context.ProjectType, "ID", "Name");
+			ViewBag.ProjectManager = _utilities.CreateSelectList(_context.Employee.Where(e => e.Position.Name == "Project Manager"), "ID", "FullName");
 			return View("Create");
 		}
 
@@ -75,9 +76,9 @@ namespace OutOfOfficeHRApp.Controllers
 		[HttpGet("Edit/{id}")]
 		public async Task<IActionResult> UpdateProject(int id)
 		{
-			ViewBag.AllEmployees = CreateSelectList(_context.Employee, "ID", "FullName");
-			ViewBag.ProjectManager = CreateSelectList(_context.Employee.Where(e => e.Position.Name == "Project Manager"), "ID", "FullName");
-			ViewBag.ProjectType = CreateSelectList(_context.ProjectType, "ID", "Name");
+			ViewBag.AllEmployees = _utilities.CreateSelectList(_context.Employee, "ID", "FullName");
+			ViewBag.ProjectManager = _utilities.CreateSelectList(_context.Employee.Where(e => e.Position.Name == "Project Manager"), "ID", "FullName");
+			ViewBag.ProjectType = _utilities.CreateSelectList(_context.ProjectType, "ID", "Name");
 			var project = await _context.Project
 										.Include(p => p.ProjectManager)
 										.Include(p => p.ProjectType)

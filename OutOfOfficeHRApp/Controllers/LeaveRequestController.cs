@@ -11,9 +11,11 @@ namespace OutOfOfficeHRApp.Controllers
 	public class LeaveRequestController : Controller
 	{
 		private readonly OutOfOfficeContext _context;
-		public LeaveRequestController(OutOfOfficeContext context)
+		private readonly Utilities _utilities;
+		public LeaveRequestController(OutOfOfficeContext context, Utilities utilities)
 		{
 			_context = context;
+			_utilities = utilities;
 		}
 
 		[HttpGet]
@@ -28,6 +30,7 @@ namespace OutOfOfficeHRApp.Controllers
 
 			var leaveRequests = await _context.LeaveRequest.Skip((page - 1) * pageSize)
 										  .Take(pageSize).Include(lr => lr.Employee).Include(lr => lr.AbsenceReason).ToListAsync();
+			var name = User.Identity.Name.ToLower();
 			return View("Index", leaveRequests);
 		}
 
@@ -47,8 +50,8 @@ namespace OutOfOfficeHRApp.Controllers
 		[HttpGet("Create")]
 		public IActionResult AddLeaveRequest()
 		{
-			ViewBag.Employee = CreateSelectList(_context.Employee, "ID", "FullName");
-			ViewBag.AbsenceReason = CreateSelectList(_context.AbsenceReason, "ID", "Name");
+			ViewBag.Employee = _utilities.CreateSelectList(_context.Employee, "ID", "FullName");
+			ViewBag.AbsenceReason = _utilities.CreateSelectList(_context.AbsenceReason, "ID", "Name");
 
 			return View("Create");
 		}
