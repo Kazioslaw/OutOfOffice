@@ -84,6 +84,7 @@ namespace OutOfOfficeHRApp.Controllers
 										.Include(p => p.ProjectType)
 										.Include(p => p.Employees)
 										.FirstOrDefaultAsync(p => p.ID == id);
+			ViewBag.SelectedEmployeesID = project.Employees.Select(e => e.ID).ToList();
 			return View("Edit", project);
 		}
 
@@ -91,11 +92,12 @@ namespace OutOfOfficeHRApp.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> UpdateProject(int id, Project project, List<int> selectedEmployees)
 		{
-			var existingProject = await _context.Project.FirstOrDefaultAsync(p => p.ID == id);
+			var existingProject = await _context.Project.Include(p => p.Employees).FirstOrDefaultAsync(p => p.ID == id);
 			if (existingProject == null)
 			{
 				return NotFound();
 			}
+
 			existingProject.Employees.Clear();
 			if (selectedEmployees != null)
 			{
@@ -105,15 +107,17 @@ namespace OutOfOfficeHRApp.Controllers
 					if (employee != null)
 					{
 						existingProject.Employees.Add(employee);
+
+						employee.ProjectID = existingProject.ID;
+						_context.Employee.Update(employee);
 					}
 				}
 			}
 			existingProject.ProjectTypeID = project.ProjectTypeID;
-			existingProject.StartDate = project.StartDate;
-			existingProject.EndDate = project.EndDate;
 			existingProject.ProjectManagerID = project.ProjectManagerID;
 			existingProject.Comment = project.Comment;
 			_context.Project.Update(existingProject);
+			await _context.SaveChangesAsync();
 			return RedirectToAction("Index");
 		}
 
