@@ -76,7 +76,13 @@ namespace OutOfOfficeHRApp.Controllers
 		[HttpGet("Edit/{id}")]
 		public async Task<IActionResult> UpdateProject(int id)
 		{
-			ViewBag.AllEmployees = _utilities.CreateSelectList(_context.Employee, "ID", "FullName");
+			ViewBag.AllEmployees = await _context.Employee.Where(e => e.Position.Name == "Employee").Select(e => new
+			{
+				e.ID,
+				e.FullName,
+				e.ProjectID
+			}).ToListAsync();
+
 			ViewBag.ProjectManager = _utilities.CreateSelectList(_context.Employee.Where(e => e.Position.Name == "Project Manager"), "ID", "FullName");
 			ViewBag.ProjectType = _utilities.CreateSelectList(_context.ProjectType, "ID", "Name");
 			var project = await _context.Project

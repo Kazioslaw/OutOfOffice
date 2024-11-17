@@ -254,6 +254,10 @@ namespace OutOfOfficeHRApp.Controllers
 		public async Task<IActionResult> Activate(int id)
 		{
 			var employee = await _context.Employee.FirstOrDefaultAsync(e => e.ID == id);
+			if (employee == null)
+			{
+				return NotFound();
+			}
 			employee.IsActive = true;
 			_context.Employee.Update(employee);
 			await _context.SaveChangesAsync();
@@ -272,7 +276,10 @@ namespace OutOfOfficeHRApp.Controllers
 			}
 			employee.IsActive = false;
 			var user = await _userManager.FindByNameAsync(employee.FullName.Replace(" ", "_"));
-			await _userManager.DeleteAsync(user);
+			if (user != null)
+			{
+				await _userManager.DeleteAsync(user);
+			}
 			_context.Employee.Update(employee);
 			await _context.SaveChangesAsync();
 			return RedirectToAction(nameof(GetEmployee));
