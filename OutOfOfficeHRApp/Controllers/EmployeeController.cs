@@ -253,12 +253,39 @@ namespace OutOfOfficeHRApp.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Activate(int id)
 		{
-			var employee = await _context.Employee.FirstOrDefaultAsync(e => e.ID == id);
+			var employee = await _context.Employee.Include(e => e.Position).FirstOrDefaultAsync(e => e.ID == id);
 			if (employee == null)
 			{
 				return NotFound();
 			}
+			var user = await _userManager.FindByEmailAsync(employee.Email);
+
+			var tempPassword = "P@ssword1";
+			if (user == null)
+			{
+				var tempUser = new User
+				{
+					UserName = await _utilities.GenerateUsername(employee.FullName),
+					Email = employee.Email,
+					EmailConfirmed = true
+				};
+
+
+				var userResult = await _userManager.CreateAsync(tempUser, tempPassword);
+				if (userResult.Succeeded)
+				{
+					if (employee.Position.Name == "Administrator")
+					{
+						await _userManager.AddToRoleAsync(user, "Admin");
+					}
+					else
+					{
+						await _userManager.AddToRoleAsync(tempUser, employee.Position.Name);
+					}
+				}
+			}
 			employee.IsActive = true;
+
 			_context.Employee.Update(employee);
 			await _context.SaveChangesAsync();
 			return RedirectToAction(nameof(GetEmployee));
